@@ -1,0 +1,177 @@
+﻿<Window x:Class="NewCustomerWindow.xaml.EmployeeDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NewCustomerWindow.xaml"
+        mc:Ignorable="d"
+        Title="EmployeeDetailsWindow"  Width="600"
+        Height="670"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterScreen">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Border Margin="20" Background="White" Padding="20" CornerRadius="10" BorderBrush="#ccc" BorderThickness="1">
+            <StackPanel>
+
+
+                <!-- Row 1 -->
+                <Grid Margin="0 0 0 20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Employee Details" FontSize="22" FontWeight="Bold" Foreground="#2a4d69" VerticalAlignment="Center" />
+
+                    <Button Content="Back to List" Grid.Column="1" Click="BackToList_Click"
+            Background="#007bff" Foreground="White" FontWeight="Bold" Padding="10,5"
+            Margin="10,0,0.333,0" Height="29" VerticalAlignment="Top" />
+                </Grid>
+
+
+                <!-- Row 1 -->
+                <Grid Margin="0 0 0 15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="10">
+                        <TextBlock Text="Title" FontWeight="Bold"/>
+                        <ComboBox x:Name="TitleBox">
+                            <ComboBoxItem Content="Mr"/>
+                            <ComboBoxItem Content="Mrs"/>
+                            <ComboBoxItem Content="Miss"/>
+                            <ComboBoxItem Content="Dr"/>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10">
+                        <TextBlock Text="Status" FontWeight="Bold"/>
+                        <ComboBox x:Name="StatusBox">
+                            <ComboBoxItem Content="Single"/>
+                            <ComboBoxItem IsSelected="True" Content="Married"/>
+                            <ComboBoxItem Content="Divorced"/>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Row 2 -->
+                <Grid Margin="0 0 0 15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="10">
+                        <TextBlock Text="Full Name" FontWeight="Bold"/>
+                        <TextBox x:Name="NameBox" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10">
+                        <TextBlock Text="Field" FontWeight="Bold"/>
+                        <ListBox x:Name="FieldBox" SelectionMode="Multiple" Height="100">
+                            <ListBoxItem Content="Water Supplier"/>
+                            <ListBoxItem Content="Car Washing"/>
+                            <ListBoxItem Content="Laundry Service"/>
+                            <ListBoxItem Content="Web Development"/>
+                            <ListBoxItem Content="Tea Service"/>
+                            <ListBoxItem Content="Manpower"/>
+                            <ListBoxItem Content="Housekeeping"/>
+                            <ListBoxItem Content="Stationery"/>
+                            <ListBoxItem Content="Material Supplier"/>
+                            <ListBoxItem Content="Maid Service"/>
+                        </ListBox>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Row 3 -->
+                <Grid Margin="0 0 0 15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="10">
+                        <TextBlock Text="Address" FontWeight="Bold"/>
+                        <TextBox x:Name="AddressBox"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10">
+                        <TextBlock Text="Post Code" FontWeight="Bold"/>
+                        <TextBox x:Name="PostCodeBox"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Row 4 -->
+                <Grid Margin="0 0 0 15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="10">
+                        <TextBlock Text="Mobile Phone" FontWeight="Bold"/>
+                        <TextBox x:Name="MobileBox"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10">
+                        <TextBlock Text="Email" FontWeight="Bold"/>
+                        <TextBox x:Name="EmailBox"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Row 5 -->
+                <Grid Margin="0 0 0 15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="10">
+                        <TextBlock Text="Date of Birth" FontWeight="Bold"/>
+                        <DatePicker x:Name="DobBox"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10">
+                        <TextBlock Text="Date Started" FontWeight="Bold"/>
+                        <DatePicker x:Name="DateStartedBox"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Row 6 -->
+                <Grid Margin="0 0 0 15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="10">
+                        <TextBlock Text="Department" FontWeight="Bold"/>
+                        <TextBox x:Name="DepartmentBox"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="10">
+                        <TextBlock Text="Reports To" FontWeight="Bold"/>
+                        <TextBox x:Name="ReportsToBox"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Row 7 -->
+                <StackPanel Margin="10 0 10 20">
+                    <TextBlock Text="Partner Name" FontWeight="Bold"/>
+                    <TextBox x:Name="PartnerNameBox"/>
+                </StackPanel>
+
+                <!-- Buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+                    <Button Content="Save"  Margin="5" Width="80" Background="#007bff" Foreground="White" Click="Button_Click"/>
+                    <Button Content="Clear" Margin="5" Width="80" Background="#007bff" Foreground="White"/>
+                    <Button Content="Delete" Margin="5" Width="80" Background="#007bff" Foreground="White"/>
+                    <Button Content="Print" Margin="5" Width="80" Background="#007bff" Foreground="White"/>
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
+</Window>

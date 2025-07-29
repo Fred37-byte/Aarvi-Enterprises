@@ -1,0 +1,140 @@
+﻿<Window x:Class="NewCustomerWindow.xaml.IndexLandingPage"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Aarvi Enterprises" Height="650" Width="1000"
+        Background="#F3F4F6" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Styles.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Header -->
+            <RowDefinition Height="Auto"/>
+            <!-- Navigation buttons -->
+            <RowDefinition Height="*"/>
+            <!-- Main content -->
+        </Grid.RowDefinitions>
+
+        <!-- 🔷 Blue Header -->
+        <Border Background="#0D47A1" Grid.Row="0" Padding="16">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <!-- For "Aarvi Enterprises" -->
+                    <ColumnDefinition Width="*"/>
+                    <!-- Spacer -->
+                    <ColumnDefinition Width="Auto"/>
+                    <!-- For "Online Services" -->
+                </Grid.ColumnDefinitions>
+
+                <!-- Left-aligned: Aarvi Enterprises -->
+                <TextBlock Grid.Column="0"
+                   Text="Aarvi Enterprises"
+                   FontSize="24"
+                   FontWeight="Bold"
+                   Foreground="White"
+                   VerticalAlignment="Center"/>
+
+                <!-- Right side centered: Online Services -->
+                <TextBlock Grid.Column="1"
+                   Text="Online Services"
+                   FontSize="24"
+                   FontWeight="SemiBold"
+                   Foreground="#FFCA28"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Center" Margin="121.667,0,314.667,0"/>
+            </Grid>
+        </Border>
+
+        <!-- ⬜ White background for navigation buttons -->
+        <Border  Grid.Row="1" Padding="10"   HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,0">
+                <Button x:Name="BtnEmployees" Click="BtnEmployees_Click" Content="Our Employees" Style="{StaticResource NavButton}" Margin="5"/>
+                <Button x:Name="BtnNewCustomers" Click="BtnNewCustomers_Click" Content="New Customers" Style="{StaticResource NavButton}" Margin="5"/>
+                <Button x:Name="BtnInvoices" Click="BtnInvoices_Click" Content="Customer Invoices" Style="{StaticResource NavButton}" Margin="5"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 🧾 Main Content Area -->
+        <Border Grid.Row="2"
+                Margin="30"
+                Background="White"
+                Padding="20"
+                BorderBrush="#B0BEC5"
+                BorderThickness="1"
+                CornerRadius="10">
+            <StackPanel>
+                <TextBlock Text="Our Services"
+                           FontSize="22"
+                           FontWeight="Bold"
+                           Foreground="#0D47A1"
+                           Margin="0 0 0 20"/>
+
+                <UniformGrid Columns="3" Margin="0,0,0,0">
+                    <!-- Services -->
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="Assets/water.jpeg" Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Water Supplier" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="Assets/car.jpg" Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Car Washing Service" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Source="Assets/laundry.jpg" Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Laundry Service" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Web Development" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Tea Service" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Manpower Service" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Housekeeping" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Stationery" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Material Supplier" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="Aarvi Maid Service" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="5">
+                        <Image Height="20" Width="20" Margin="0,0,10,0"/>
+                        <TextBlock Text="All Services" Style="{StaticResource ServiceText}"/>
+                    </StackPanel>
+                </UniformGrid>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

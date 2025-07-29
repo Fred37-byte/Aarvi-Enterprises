@@ -1,0 +1,102 @@
+﻿<Window x:Class="NewCustomerWindow.xaml.ViewInvoiceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NewCustomerWindow.xaml"
+        mc:Ignorable="d"
+        Title="Customer Invoice Details" Height="600" Width="850"
+        WindowStartupLocation="CenterScreen"
+        Background="White">
+
+    <Grid Margin="20">
+        <StackPanel>
+
+            <!-- 🔹 Title -->
+            <TextBlock Text="Customer Information"
+                       FontSize="22"
+                       FontWeight="Bold"
+                       Margin="0 0 0 15"
+                       Foreground="#2c3e50"/>
+
+            <!-- 🔹 Customer Details -->
+            <UniformGrid Columns="2" Margin="0 0 0 15">
+                <StackPanel Orientation="Horizontal" Margin="0 5">
+                    <TextBlock Text="Name: " FontWeight="Bold"/>
+                    <TextBlock x:Name="txtName"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0 5">
+                    <TextBlock Text="Email: " FontWeight="Bold"/>
+                    <TextBlock x:Name="txtEmail"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0 5">
+                    <TextBlock Text="Phone: " FontWeight="Bold"/>
+                    <TextBlock x:Name="txtPhone"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" Margin="0 5" Grid.ColumnSpan="2">
+                    <TextBlock Text="Address: " FontWeight="Bold"/>
+                    <TextBlock x:Name="txtAddress" TextWrapping="Wrap" Width="600"/>
+                </StackPanel>
+            </UniformGrid>
+
+            <!-- 🔹 Separator -->
+            <Separator Margin="0 10"/>
+
+            <!-- 🔹 Invoices Header -->
+            <TextBlock Text="Invoices"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Margin="0 0 0 10"
+                       Foreground="#2c3e50"/>
+
+            <!-- 🔹 Invoice Grid -->
+            <DataGrid x:Name="invoiceGrid"
+                      AutoGenerateColumns="False"
+                      HeadersVisibility="Column"
+                      CanUserAddRows="False"
+                      RowHeight="30"
+                      FontSize="14"
+                      Height="300"
+                      Margin="0 0 0 10"
+                      AlternatingRowBackground="#f9f9f9"
+                      BorderBrush="#ddd"
+                      BorderThickness="1">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Date" Binding="{Binding InvoiceDate, StringFormat=d}" Width="120"/>
+                    <DataGridTextColumn Header="Type" Binding="{Binding InvoiceType}" Width="160"/>
+                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
+                    <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=₹{0:N2}}" Width="120"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- 🔹 Bottom Buttons (Fix: Use Margin instead of Spacing) -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0 10 0 0">
+                <Button Content="Download PDF"
+                        Width="120"
+                        Height="30"
+                        Margin="0 0 10 0"
+                        Click="DownloadPdf_Click"
+                        Background="#3498db"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        BorderThickness="0"
+                        Cursor="Hand"/>
+
+                <Button Content="Close"
+                        Width="100"
+                        Height="30"
+                        Click="Close_Click"
+                        Background="#e74c3c"
+                        Foreground="White"
+                        FontWeight="Bold"
+                        BorderThickness="0"
+                        Cursor="Hand"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,109 @@
+﻿<Window x:Class="NewCustomerWindow.InvoiceListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="InvoiceListWindow" Height="500" Width="1200">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <!-- Header + Filters -->
+            <RowDefinition Height="*"/>
+            <!-- DataGrid -->
+            <RowDefinition Height="Auto"/>
+            <!-- Export Button -->
+        </Grid.RowDefinitions>
+
+        <!-- Header + Filters -->
+        <StackPanel Grid.Row="0">
+            <TextBlock Text="All Invoices"
+                   FontSize="22"
+                   FontWeight="Bold"
+                   Foreground="#2a4d69"
+                   Margin="0 0 0 20"
+                   HorizontalAlignment="Center"/>
+
+            <!-- Search Panel (same as yours) -->
+            <StackPanel Orientation="Horizontal" Margin="0 0 0 10">
+                <Label Content="From:" VerticalAlignment="Center" Margin="5 0"/>
+                <DatePicker x:Name="dpStartDate" Width="120" Margin="0 0 10 0"/>
+
+                <Label Content="To:" VerticalAlignment="Center" Margin="5 0"/>
+                <DatePicker x:Name="dpEndDate" Width="120" Margin="0 0 10 0"/>
+
+                <Label Content="Type:" VerticalAlignment="Center" Margin="5 0"/>
+                <ComboBox x:Name="cmbInvoiceType" Width="140" Margin="0 0 10 0" Loaded="cmbInvoiceType_Loaded">
+                    <ComboBoxItem Content="-- Select Type --" IsSelected="True" IsEnabled="False"/>
+                </ComboBox>
+
+                <Label Content="Status:" VerticalAlignment="Center" Margin="5 0"/>
+                <ComboBox x:Name="cmbStatus" Width="130" Margin="0 0 10 0">
+                    <ComboBoxItem Content="-- Select Status --" IsSelected="True" IsEnabled="False"/>
+                    <ComboBoxItem Content="Paid"/>
+                    <ComboBoxItem Content="Unpaid"/>
+                    <ComboBoxItem Content="Pending"/>
+                </ComboBox>
+
+                <Label Content="Customer:" VerticalAlignment="Center" Margin="5 0"/>
+                <TextBox x:Name="txtCustomerName" Width="150" Margin="0 0 10 0"/>
+
+                <Button Content="Search 🔍" Width="80" Click="SearchButton_Click"/>
+                <Button Content="Clear ❌" Width="80" Margin="5 0 0 0" Click="ClearButton_Click"/>
+            </StackPanel>
+
+            <Label x:Name="lblNoResults"
+               Content="😶 No results found"
+               Foreground="Gray"
+               FontSize="14"
+               Visibility="Collapsed"
+               HorizontalAlignment="Center"
+               Margin="0 0 0 10"/>
+        </StackPanel>
+
+        <!-- DataGrid in Center -->
+        <DataGrid x:Name="InvoiceGrid"
+              Grid.Row="1"
+              AutoGenerateColumns="False"
+              IsReadOnly="True"
+              CanUserAddRows="False"
+              HeadersVisibility="Column"
+              HorizontalScrollBarVisibility="Auto"
+              Margin="0 0 0 20">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Ref" Binding="{Binding Id}" Width="60"/>
+                <DataGridTextColumn Header="Date" Binding="{Binding InvoiceDate, StringFormat='dd-MM-yyyy'}"/>
+                <DataGridTextColumn Header="Type" Binding="{Binding InvoiceType}" Width="150"/>
+                <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="150"/>
+                <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
+                <DataGridTextColumn Header="Total" Binding="{Binding Amount, StringFormat=₹{0:N2}}" Width="100"/>
+                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+                <DataGridTemplateColumn Header="Actions" Width="130">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <Button Content="✏" Width="30" Margin="2" Click="EditInvoice_Click"/>
+                                <Button Content="🗑" Width="30" Margin="2" Click="DeleteInvoice_Click"/>
+                                <Button Content="👁" Width="30" Margin="2" Click="ViewInvoice_Click"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Export Button in Bottom-Right -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="📤 Export All Tables to Excel"
+                Width="200"
+                Height="35"
+                Margin="0,0,0,9.667"
+                Background="#2a4d69"
+                Foreground="White"
+                FontWeight="Bold"
+                Click="BtnExportAllTables_Click" VerticalAlignment="Bottom"/>
+        </StackPanel>
+    </Grid>
+
+</Window>
