@@ -23,6 +23,12 @@ namespace NewCustomerWindow.xaml
             newcustomerWindow.ShowDialog();
         }
 
+        private void HelpButton_Click(object sender, RoutedEventArgs e)
+        {
+            HelpWindow helpWindow = new HelpWindow();
+            helpWindow.Owner = this;
+            helpWindow.ShowDialog(); // modal
+        }
 
 
 

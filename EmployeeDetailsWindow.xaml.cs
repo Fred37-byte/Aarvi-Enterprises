@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,6 +12,7 @@ namespace NewCustomerWindow.xaml
         private string connectionString = ConfigurationManager.ConnectionStrings["EmployeeDB"].ConnectionString;
         private bool isEditMode = false;
         private int existingEmployeeId = 0;
+        private bool isSaving = false; // To prevent double-save
 
         public Employee NewEmployee { get; private set; }
 
@@ -23,7 +21,6 @@ namespace NewCustomerWindow.xaml
             InitializeComponent();
         }
 
-        // ✅ New Constructor for Edit Mode
         public EmployeeDetailsWindow(Employee existingEmployee) : this()
         {
             if (existingEmployee != null)
@@ -31,13 +28,12 @@ namespace NewCustomerWindow.xaml
                 isEditMode = true;
                 existingEmployeeId = existingEmployee.Id;
 
-                // Pre-fill the form
                 NameBox.Text = existingEmployee.Name;
                 EmailBox.Text = existingEmployee.Email;
                 DepartmentBox.Text = existingEmployee.Department;
                 MobileBox.Text = existingEmployee.Mobile;
 
-                // For simplicity: You can also load the rest if necessary
+                // You can also pre-fill other fields if needed
             }
         }
 
@@ -48,63 +44,116 @@ namespace NewCustomerWindow.xaml
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            // Prepare data
-            string fullName = NameBox.Text;
-            string email = EmailBox.Text;
-            string department = DepartmentBox.Text;
-            string mobile = MobileBox.Text;
-
-            // Additional fields as needed
-            StringBuilder selectedFields = new StringBuilder();
-            foreach (var item in FieldBox.SelectedItems)
+            if (isSaving)
             {
-                if (item is ListBoxItem listBoxItem)
-                {
-                    selectedFields.Append(listBoxItem.Content.ToString()).Append(", ");
-                }
+                MessageBox.Show("⏳ Already saving. Please wait...");
+                return;
             }
-            string fieldsString = selectedFields.ToString().TrimEnd(',', ' ');
+
+            isSaving = true;
+
+            string fullName = NameBox.Text.Trim();
+            string email = EmailBox.Text.Trim().ToLower();
+            string mobile = MobileBox.Text.Trim();
+            string department = DepartmentBox.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(fullName) ||
+                string.IsNullOrWhiteSpace(email) ||
+                string.IsNullOrWhiteSpace(mobile))
+            {
+                MessageBox.Show("❗ Please fill out Name, Email, and Mobile.");
+                isSaving = false;
+                return;
+            }
+
+            string title = (TitleBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+            string status = (StatusBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+            string field = GetSelectedFields();
+            string address = AddressBox.Text.Trim();
+            string postCode = PostCodeBox.Text.Trim();
+            DateTime? dob = DobBox.SelectedDate;
+            DateTime? dateStarted = DateStartedBox.SelectedDate;
+            string reportsTo = ReportsToBox.Text.Trim();
+            string partnerName = PartnerNameBox.Text.Trim();
 
             try
             {
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     conn.Open();
-                    SqlCommand cmd;
 
+                    if (!isEditMode)
+                    {
+                        // Check for duplicates (case-insensitive)
+                        string checkQuery = @"
+                    SELECT COUNT(*) FROM Employees 
+                    WHERE LOWER(Email) = @Email AND MobilePhone = @MobilePhone";
+
+                        using (SqlCommand checkCmd = new SqlCommand(checkQuery, conn))
+                        {
+                            checkCmd.Parameters.AddWithValue("@Email", email);
+                            checkCmd.Parameters.AddWithValue("@MobilePhone", mobile);
+
+                            int duplicateCount = (int)checkCmd.ExecuteScalar();
+                            if (duplicateCount > 0)
+                            {
+                                MessageBox.Show("⚠️ Duplicate entry: Same email and mobile already exist.");
+                                isSaving = false;
+                                return;
+                            }
+                        }
+                    }
+
+                    SqlCommand cmd;
                     if (isEditMode)
                     {
-                        // ✅ UPDATE QUERY
                         cmd = new SqlCommand(@"UPDATE Employees SET 
-                            FullName = @FullName,
-                            Email = @Email,
-                            Department = @Department,
-                            MobilePhone = @MobilePhone,
-                            Field = @Field
-                            WHERE Id = @Id", conn);
-
+                    Title = @Title,
+                    Status = @Status,
+                    FullName = @FullName,
+                    Field = @Field,
+                    Address = @Address,
+                    PostCode = @PostCode,
+                    MobilePhone = @MobilePhone,
+                    Email = @Email,
+                    DateOfBirth = @DateOfBirth,
+                    DateStarted = @DateStarted,
+                    Department = @Department,
+                    ReportsTo = @ReportsTo,
+                    PartnerName = @PartnerName
+                    WHERE Id = @Id", conn);
                         cmd.Parameters.AddWithValue("@Id", existingEmployeeId);
                     }
                     else
                     {
-                        // ✅ INSERT QUERY
-                        cmd = new SqlCommand(@"INSERT INTO Employees 
-                            (FullName, Email, Department, MobilePhone, Field)
-                            VALUES 
-                            (@FullName, @Email, @Department, @MobilePhone, @Field)", conn);
+                        cmd = new SqlCommand(@"INSERT INTO Employees (
+                    Title, Status, FullName, Field, Address, PostCode,
+                    MobilePhone, Email, DateOfBirth, DateStarted, Department,
+                    ReportsTo, PartnerName
+                ) VALUES (
+                    @Title, @Status, @FullName, @Field, @Address, @PostCode,
+                    @MobilePhone, @Email, @DateOfBirth, @DateStarted, @Department,
+                    @ReportsTo, @PartnerName
+                )", conn);
                     }
 
-                    // Common parameters
+                    cmd.Parameters.AddWithValue("@Title", title ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Status", status ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@FullName", fullName);
-                    cmd.Parameters.AddWithValue("@Email", email);
-                    cmd.Parameters.AddWithValue("@Department", department);
+                    cmd.Parameters.AddWithValue("@Field", field);
+                    cmd.Parameters.AddWithValue("@Address", address);
+                    cmd.Parameters.AddWithValue("@PostCode", postCode);
                     cmd.Parameters.AddWithValue("@MobilePhone", mobile);
-                    cmd.Parameters.AddWithValue("@Field", fieldsString);
+                    cmd.Parameters.AddWithValue("@Email", email);
+                    cmd.Parameters.AddWithValue("@DateOfBirth", (object)dob ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@DateStarted", (object)dateStarted ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Department", department);
+                    cmd.Parameters.AddWithValue("@ReportsTo", reportsTo);
+                    cmd.Parameters.AddWithValue("@PartnerName", partnerName);
 
                     cmd.ExecuteNonQuery();
                 }
 
-                // For communication back to the caller
                 NewEmployee = new Employee
                 {
                     Id = existingEmployeeId,
@@ -120,8 +169,27 @@ namespace NewCustomerWindow.xaml
             }
             catch (Exception ex)
             {
-                MessageBox.Show("❌ Database Error: " + ex.Message);
+                MessageBox.Show("❌ Error: " + ex.Message);
             }
+            finally
+            {
+                isSaving = false;
+            }
+        }
+
+
+
+        private string GetSelectedFields()
+        {
+            StringBuilder selectedFields = new StringBuilder();
+            foreach (var item in FieldBox.SelectedItems)
+            {
+                if (item is ListBoxItem listBoxItem)
+                {
+                    selectedFields.Append(listBoxItem.Content.ToString()).Append(", ");
+                }
+            }
+            return selectedFields.ToString().TrimEnd(',', ' ');
         }
     }
 }

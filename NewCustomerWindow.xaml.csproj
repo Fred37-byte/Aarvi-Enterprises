@@ -173,6 +173,9 @@
       <DependentUpon>EmployeeList.xaml</DependentUpon>
     </Compile>
     <Compile Include="EmployeeService.cs" />
+    <Compile Include="HelpWindow.xaml.cs">
+      <DependentUpon>HelpWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IndexLandingPage.xaml.cs">
       <DependentUpon>IndexLandingPage.xaml</DependentUpon>
     </Compile>
@@ -205,6 +208,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="EmployeeList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="HelpWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -265,12 +272,14 @@
     <Resource Include="Assets\water.jpeg" />
     <Resource Include="Assets\car.jpg" />
     <Resource Include="Assets\laundry.jpg" />
+    <Resource Include="Assets\help.jpg" />
     <Content Include="Fonts\OpenSans-Bold.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Fonts\OpenSans-Regular.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ExportToExcelConsoleApp.csproj" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

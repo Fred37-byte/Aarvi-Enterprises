@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:NewCustomerWindow.xaml"
         mc:Ignorable="d"
         Title="EmployeeDetailsWindow"  Width="600"
-        Height="670"
+        Height="770"
         ResizeMode="CanResize"
         WindowStartupLocation="CenterScreen">
     <ScrollViewer VerticalScrollBarVisibility="Auto">

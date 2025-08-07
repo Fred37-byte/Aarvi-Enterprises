@@ -40,10 +40,9 @@ namespace NewCustomerWindow
             var detailsWindow = new EmployeeDetailsWindow();
             if (detailsWindow.ShowDialog() == true)
             {
-                var newEmp = detailsWindow.NewEmployee;
-                EmployeeService.AddEmployee(newEmp); // Save to DB
-                LoadEmployeesFromDatabase();
+                LoadEmployeesFromDatabase(); // ✅ Just refresh, don't re-add
             }
+
         }
 
         private void EditButton_Click(object sender, RoutedEventArgs e)

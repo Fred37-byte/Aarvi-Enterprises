@@ -59,6 +59,16 @@
                 <Button x:Name="BtnEmployees" Click="BtnEmployees_Click" Content="Our Employees" Style="{StaticResource NavButton}" Margin="5"/>
                 <Button x:Name="BtnNewCustomers" Click="BtnNewCustomers_Click" Content="New Customers" Style="{StaticResource NavButton}" Margin="5"/>
                 <Button x:Name="BtnInvoices" Click="BtnInvoices_Click" Content="Customer Invoices" Style="{StaticResource NavButton}" Margin="5"/>
+                <Button x:Name="HelpButton"
+                  Width="40" Height="30"
+                  Margin="10,0,0,0"
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Center"
+                  Click="HelpButton_Click"
+                  ToolTip="Click for help">
+                    <Image Source="Assets/help.jpg"/>
+                </Button>
+
             </StackPanel>
         </Border>
 
@@ -78,62 +88,95 @@
                            Margin="0 0 0 20"/>
 
                 <UniformGrid Columns="3" Margin="0,0,0,0">
-                    <!-- Services -->
+                    <!-- Aarvi Water Supplier -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="Assets/water.jpeg" Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Water Supplier" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Water Supplier" Style="{StaticResource ServiceText}"
+                   ToolTip="We deliver clean drinking water across the city."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Car Washing Service -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="Assets/car.jpg" Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Car Washing Service" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Car Washing Service" Style="{StaticResource ServiceText}"
+                   ToolTip="Professional car cleaning at your doorstep."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Laundry Service -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Source="Assets/laundry.jpg" Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Laundry Service" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Laundry Service" Style="{StaticResource ServiceText}"
+                   ToolTip="Affordable laundry pickup and delivery services."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Web Development -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Web Development" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Web Development" Style="{StaticResource ServiceText}"
+                   ToolTip="We design modern, responsive websites."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Tea Service -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Tea Service" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Tea Service" Style="{StaticResource ServiceText}"
+                   ToolTip="Fresh tea and beverages for offices and events."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Manpower Service -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Manpower Service" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Manpower Service" Style="{StaticResource ServiceText}"
+                   ToolTip="Trained staff for various industries and roles."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Housekeeping -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Housekeeping" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Housekeeping" Style="{StaticResource ServiceText}"
+                   ToolTip="Reliable housekeeping services for homes and offices."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Stationery -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Stationery" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Stationery" Style="{StaticResource ServiceText}"
+                   ToolTip="Complete office and school stationery supplies."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Material Supplier -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Material Supplier" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Material Supplier" Style="{StaticResource ServiceText}"
+                   ToolTip="Building and industrial material supply services."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- Aarvi Maid Service -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Maid Service" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="Aarvi Maid Service" Style="{StaticResource ServiceText}"
+                   ToolTip="Trained maids available for daily or part-time work."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
 
+                    <!-- All Services -->
                     <StackPanel Orientation="Horizontal" Margin="5">
                         <Image Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="All Services" Style="{StaticResource ServiceText}"/>
+                        <TextBlock Text="All Services" Style="{StaticResource ServiceText}"
+                   ToolTip="View all our available services in one place."
+                   ToolTipService.InitialShowDelay="0"/>
                     </StackPanel>
                 </UniformGrid>
+
             </StackPanel>
         </Border>
     </Grid>

@@ -1,0 +1,65 @@
+﻿
+using System.Data;
+using System.Data.SqlClient;
+using System.IO;
+using ClosedXML.Excel;
+using System.Collections.Generic;
+
+namespace NewCustomerWindow.xaml
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string connectionString = "Server=DESKTOP-71OLI2R;Database=BusinessManager;Trusted_Connection=True;";
+            string exportPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SqlExport.xlsx");
+
+            using (XLWorkbook workbook = new XLWorkbook())
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                conn.Open();
+
+                DataTable schema = conn.GetSchema("Tables");
+                List<string> userTables = new List<string>();
+
+                foreach (DataRow row in schema.Rows)
+                {
+                    if (row["TABLE_TYPE"].ToString() == "BASE TABLE")
+                        userTables.Add(row["TABLE_NAME"].ToString());
+                }
+
+                foreach (string tableName in userTables)
+                {
+                    try
+                    {
+                        DataTable dt = new DataTable();
+
+                        using (SqlCommand cmd = new SqlCommand($"SELECT * FROM {tableName}", conn))
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                        {
+                            adapter.Fill(dt);
+                        }
+
+                        string[] columnsToSkip = { "RowVersion", "IsDeleted", "PasswordHash" };
+                        foreach (string colName in columnsToSkip)
+                        {
+                            if (dt.Columns.Contains(colName))
+                                dt.Columns.Remove(colName);
+                        }
+
+                        var ws = workbook.Worksheets.Add(dt, tableName);
+                        ws.Row(1).Style.Font.Bold = true;
+                        ws.Columns().AdjustToContents();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error exporting table {tableName}: {ex.Message}");
+                    }
+                }
+
+                workbook.SaveAs(exportPath);
+                Console.WriteLine("✅ All tables exported successfully to Excel!");
+            }
+        }
+    }
+}
