@@ -22,6 +22,7 @@ namespace NewCustomerWindow
             CityBox.Clear();
             StateBox.Clear();
             ZipBox.Clear();
+            ServiceComboBox.SelectedIndex = -1; // clear dropdown
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -33,6 +34,7 @@ namespace NewCustomerWindow
             string city = CityBox.Text.Trim();
             string state = StateBox.Text.Trim();
             string zip = ZipBox.Text.Trim();
+            string serviceType = (ServiceComboBox.SelectedItem as System.Windows.Controls.ComboBoxItem)?.Content?.ToString();
 
             if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(email))
             {
@@ -40,11 +42,17 @@ namespace NewCustomerWindow
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(serviceType))
+            {
+                MessageBox.Show("Please select a service.", "Missing Data", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             string connectionString = ConfigurationManager.ConnectionStrings["EmployeeDB"].ConnectionString;
 
             string query = @"
-                INSERT INTO Customers (FullName, Email, Phone, Address, City, State, ZipCode)
-                VALUES (@FullName, @Email, @Phone, @Address, @City, @State, @ZipCode)
+                INSERT INTO Customers (FullName, Email, Phone, Address, City, State, ZipCode, ServiceType)
+                VALUES (@FullName, @Email, @Phone, @Address, @City, @State, @ZipCode, @ServiceType)
             ";
 
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -57,14 +65,15 @@ namespace NewCustomerWindow
                 cmd.Parameters.AddWithValue("@City", string.IsNullOrWhiteSpace(city) ? (object)DBNull.Value : city);
                 cmd.Parameters.AddWithValue("@State", string.IsNullOrWhiteSpace(state) ? (object)DBNull.Value : state);
                 cmd.Parameters.AddWithValue("@ZipCode", string.IsNullOrWhiteSpace(zip) ? (object)DBNull.Value : zip);
+                cmd.Parameters.AddWithValue("@ServiceType", serviceType);
 
                 try
                 {
                     conn.Open();
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show($"Customer '{name}' saved successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                    this.Close(); // Close the current window after saving
+                    MessageBox.Show($"Customer '{name}' saved successfully with service '{serviceType}'!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    this.Close();
                 }
                 catch (Exception ex)
                 {

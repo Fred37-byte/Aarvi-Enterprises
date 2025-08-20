@@ -10,6 +10,12 @@ namespace NewCustomerWindow.xaml
         {
             InitializeComponent();
         }
+        private void OpenWaterServiceWindow(object sender, RoutedEventArgs e)
+        {
+            WaterServiceWindow wsWindow = new WaterServiceWindow();
+            wsWindow.ShowDialog(); // or .Show() if you don't want it modal
+        }
+
 
         private void BtnEmployees_Click(object sender, RoutedEventArgs e)
         {

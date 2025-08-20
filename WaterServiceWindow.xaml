@@ -1,0 +1,98 @@
+﻿<Window x:Class="NewCustomerWindow.xaml.WaterServiceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NewCustomerWindow.xaml"
+        mc:Ignorable="d"
+        Title="WaterServiceWindow" Height="450" Width="930">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Title Row with Search -->
+        <DockPanel Margin="0,0,0,10">
+            <TextBlock Text="💧 Water Service Orders" 
+                       FontSize="22" FontWeight="Bold"
+                       Foreground="#0078D7"
+                       DockPanel.Dock="Left"/>
+
+            <!-- Search Bar -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+                <Label Content="Search:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <TextBox Name="SearchTextBox" Width="200" Height="28" 
+                         Margin="0,0,5,0" 
+                         VerticalContentAlignment="Center"
+                         TextChanged="SearchTextBox_TextChanged"/>
+                <Button Content="Search" Width="70" Height="28" 
+                        Background="#0078D7" Foreground="White"
+                        Click="SearchButton_Click"/>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Form & List -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="20"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left Form -->
+            <Border Grid.Column="0" Background="White" Padding="15" CornerRadius="10" 
+                    VerticalAlignment="Top" BorderBrush="#DDD" BorderThickness="1">
+                <StackPanel>
+
+                    <!-- Brand -->
+                    <TextBlock Text="Brand:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <ComboBox Name="BrandCombo" Height="30" Margin="0,0,0,10">
+                        <ComboBoxItem Content="Bisleri"/>
+                        <ComboBoxItem Content="Aquafina"/>
+                        <ComboBoxItem Content="Kinley"/>
+                    </ComboBox>
+
+                    <!-- Quantity -->
+                    <TextBlock Text="Quantity:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <ComboBox Name="QuantityCombo" Height="30" Margin="0,0,0,10">
+                        <ComboBoxItem Content="5 Liters"/>
+                        <ComboBoxItem Content="10 Liters"/>
+                        <ComboBoxItem Content="20 Liters"/>
+                    </ComboBox>
+
+                    <!-- Number of Units -->
+                    <TextBlock Text="Number of Units:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Name="UnitsTextBox" Height="30" Margin="0,0,0,10" />
+
+                    <!-- Address -->
+                    <TextBlock Text="Address:" FontWeight="Bold" Margin="0,0,0,5"/>
+                    <TextBox Name="AddressTextBox" Height="60" AcceptsReturn="True"
+                             TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+                    <!-- Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="Add" Width="70" Margin="0,0,10,0" Background="#28A745" Foreground="White" Click="Add_Click"/>
+                        <Button Content="Update" Width="70" Margin="0,0,10,0" Background="#FFC107" Foreground="White" Click="Update_Click"/>
+                        <Button Content="Delete" Width="70" Background="#DC3545" Foreground="White" Click="Delete_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Right DataGrid -->
+            <DataGrid Name="OrdersDataGrid" Grid.Column="2"
+                      AutoGenerateColumns="False"
+                      Background="White" BorderBrush="#DDD" BorderThickness="1"
+                      CanUserAddRows="False" Margin="0,0,0,0"
+                      SelectionMode="Single" SelectionUnit="FullRow">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Brand" Binding="{Binding Brand}" Width="150"/>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="150"/>
+                    <DataGridTextColumn Header="Units" Binding="{Binding Units}" Width="100"/>
+                    <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+    </Grid>
+</Window>

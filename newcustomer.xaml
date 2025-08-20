@@ -1,7 +1,7 @@
 ﻿<Window x:Class="NewCustomerWindow.newcustomer"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="New Customer" Height="550" Width="620"
+        Title="New Customer" Height="570" Width="620"
         WindowStartupLocation="CenterScreen"
         Background="#f9f9f9">
 
@@ -40,6 +40,7 @@
 
         <!-- Form Section -->
         <StackPanel Grid.Row="1" VerticalAlignment="Top">
+            
             <StackPanel Margin="0 5">
                 <TextBlock Text="Full Name:" />
                 <TextBox x:Name="NameBox" Height="28" />
@@ -48,6 +49,22 @@
             <StackPanel Margin="0 5">
                 <TextBlock Text="Email:" />
                 <TextBox x:Name="EmailBox" Height="28" />
+            </StackPanel>
+            <StackPanel Margin="0 5">
+                <TextBlock Text="Select Service:" />
+                <ComboBox x:Name="ServiceComboBox" Height="28">
+                    <ComboBoxItem Content="Aarvi Water Supplier"/>
+                    <ComboBoxItem Content="Aarvi Car Washing Service"/>
+                    <ComboBoxItem Content="Aarvi Laundry Service"/>
+                    <ComboBoxItem Content="Aarvi Web Development"/>
+                    <ComboBoxItem Content="Aarvi Tea Service"/>
+                    <ComboBoxItem Content="Aarvi Housekeeping"/>
+                    <ComboBoxItem Content="Aarvi Maid Service"/>
+                    <ComboBoxItem Content="Aarvi Manpower Service"/>
+                    <ComboBoxItem Content="Aarvi Stationery"/>
+                    <ComboBoxItem Content="Aarvi Material Supplier"/>
+                    <ComboBoxItem Content="All Services"/>
+                </ComboBox>
             </StackPanel>
 
             <StackPanel Margin="0 5">
