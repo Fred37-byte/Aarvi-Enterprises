@@ -16,48 +16,53 @@ namespace NewCustomerWindow.xaml
             LoadOrders();
         }
 
-        // Add Order
-        private void Add_Click(object sender, RoutedEventArgs e)
+        // 🔹 Load orders with Invoice + Customer info
+        private void LoadOrders()
         {
             try
             {
-                string brand = (BrandCombo.SelectedItem as ComboBoxItem)?.Content.ToString();
-                string quantity = (QuantityCombo.SelectedItem as ComboBoxItem)?.Content.ToString();
-                int units = int.Parse(UnitsTextBox.Text);
-                string address = AddressTextBox.Text;
-
-                if (string.IsNullOrWhiteSpace(brand) || string.IsNullOrWhiteSpace(quantity) ||
-                    units <= 0 || string.IsNullOrWhiteSpace(address))
-                {
-                    MessageBox.Show("Please fill all fields correctly.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    return;
-                }
-
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    string query = "INSERT INTO WaterOrders (Brand, Quantity, Units, Address) VALUES (@Brand, @Quantity, @Units, @Address)";
+                    string query = @"
+                        SELECT 
+                            w.InvoiceId,
+                            i.CustomerName AS Customer,
+                            w.Brand,
+                            w.Quantity,
+                            w.Units,
+                            w.Address
+                        FROM WaterOrders w
+                        INNER JOIN Invoices i ON w.InvoiceId = i.InvoiceId";
+
                     SqlCommand cmd = new SqlCommand(query, conn);
-
-                    cmd.Parameters.AddWithValue("@Brand", brand);
-                    cmd.Parameters.AddWithValue("@Quantity", quantity);
-                    cmd.Parameters.AddWithValue("@Units", units);
-                    cmd.Parameters.AddWithValue("@Address", address);
-
                     conn.Open();
-                    cmd.ExecuteNonQuery();
-                    LoadOrders();
-                }
 
-                MessageBox.Show("Order placed successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-                LoadOrders();
-                ClearForm();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    var orders = new System.Collections.Generic.List<dynamic>();
+
+                    while (reader.Read())
+                    {
+                        orders.Add(new
+                        {
+                            InvoiceId = reader["InvoiceId"].ToString(),
+                            Customer = reader["Customer"].ToString(), // ✅ FIXED: use alias "Customer"
+                            Brand = reader["Brand"].ToString(),
+                            Quantity = reader["Quantity"].ToString(),
+                            Units = reader["Units"].ToString(),
+                            Address = reader["Address"].ToString()
+                        });
+                    }
+
+                    OrdersDataGrid.ItemsSource = orders;
+                }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message, "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Error loading orders: " + ex.Message);
             }
         }
 
+        // 🔹 Search Orders
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
             FilterOrders(SearchTextBox.Text.Trim());
@@ -75,12 +80,21 @@ namespace NewCustomerWindow.xaml
                 using (SqlConnection conn = new SqlConnection(connectionString))
                 {
                     string query = @"
-                SELECT Brand, Quantity, Units, Address 
-                FROM WaterOrders
-                WHERE Brand LIKE @search 
-                   OR Quantity LIKE @search 
-                   OR Address LIKE @search
-                   OR CAST(Units AS NVARCHAR) LIKE @search";  // ✅ Added Units search
+                        SELECT 
+                            w.InvoiceId,
+                            i.CustomerName AS Customer,
+                            w.Brand,
+                            w.Quantity,
+                            w.Units,
+                            w.Address
+                        FROM WaterOrders w
+                        INNER JOIN Invoices i ON w.InvoiceId = i.InvoiceId
+                        WHERE i.CustomerName LIKE @search
+                           OR w.Brand LIKE @search
+                           OR w.Quantity LIKE @search
+                           OR w.Address LIKE @search
+                           OR CAST(w.Units AS NVARCHAR) LIKE @search
+                           OR CAST(w.InvoiceId AS NVARCHAR) LIKE @search";
 
                     SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
                     adapter.SelectCommand.Parameters.AddWithValue("@search", "%" + searchText + "%");
@@ -97,59 +111,20 @@ namespace NewCustomerWindow.xaml
             }
         }
 
-
-
-        // Load orders into DataGrid
-        private void LoadOrders()
+        // 🔹 Ignore Add/Update/Delete for now
+        private void Add_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    string query = "SELECT * FROM WaterOrders";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    conn.Open();
-
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    var orders = new System.Collections.Generic.List<dynamic>();
-
-                    while (reader.Read())
-                    {
-                        orders.Add(new
-                        {
-                            Brand = reader["Brand"].ToString(),
-                            Quantity = reader["Quantity"].ToString(),
-                            Units = reader["Units"].ToString(),
-                            Address = reader["Address"].ToString()
-                        });
-                    }
-
-                    OrdersDataGrid.ItemsSource = orders;
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error loading orders: " + ex.Message);
-            }
-        }
-
-        // Clear form
-        private void ClearForm()
-        {
-            BrandCombo.SelectedIndex = -1;
-            QuantityCombo.SelectedIndex = -1;
-            UnitsTextBox.Clear();
-            AddressTextBox.Clear();
+            MessageBox.Show("Adding new orders is disabled for now.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Update_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show("Updating orders is disabled for now.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         private void Delete_Click(object sender, RoutedEventArgs e)
         {
-
+            MessageBox.Show("Deleting orders is disabled for now.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 }

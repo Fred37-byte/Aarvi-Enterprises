@@ -1,0 +1,155 @@
+﻿<Window x:Class="NewCustomerWindow.CarWashingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Aarvi Car Washing Service - New Subscription"
+        Height="900" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Background="#F5F5F7">
+
+    <!-- Only vertical scroll for the main page -->
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  HorizontalScrollBarVisibility="Disabled">
+
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <TextBlock Grid.Row="0" Text="🚗 Aarvi Car Washing Service"
+                       FontSize="28" FontWeight="Bold" Foreground="#4F46E5" 
+                       HorizontalAlignment="Center" Margin="0,10"/>
+
+            <!-- Top Stats -->
+            <UniformGrid Grid.Row="1" Columns="4" Margin="0,20,0,20">
+                <Border Background="White" CornerRadius="10" Padding="20" Margin="10">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="12" x:Name="txtActiveSocieties" FontSize="24" FontWeight="Bold" Foreground="#4F46E5"/>
+                        <TextBlock Text="Active Societies" FontSize="14" Foreground="Gray"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" CornerRadius="10" Padding="20" Margin="10">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="156" x:Name="txtSubscribedCars" FontSize="24" FontWeight="Bold" Foreground="#4F46E5"/>
+                        <TextBlock Text="Subscribed Cars" FontSize="14" Foreground="Gray"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" CornerRadius="10" Padding="20" Margin="10">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="8" x:Name="txtCarWashers" FontSize="24" FontWeight="Bold" Foreground="#4F46E5"/>
+                        <TextBlock Text="Car Washers" FontSize="14" Foreground="Gray"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" CornerRadius="10" Padding="20" Margin="10">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="₹78,000" x:Name="txtRevenue" FontSize="24" FontWeight="Bold" Foreground="#4F46E5"/>
+                        <TextBlock Text="Monthly Revenue" FontSize="14" Foreground="Gray"/>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <!-- Main Content -->
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="350"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Left Side: New Subscription Form -->
+                <Border Grid.Column="0" Background="White" CornerRadius="10" Padding="20" Margin="0,0,20,0">
+                    <StackPanel>
+                        <TextBlock Text="New Car Subscription" FontSize="18" FontWeight="Bold" Margin="0,0,0,20"/>
+
+                        <TextBlock Text="Society/Building *"/>
+                        <TextBox x:Name="txtSociety" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Customer Name *"/>
+                        <TextBox x:Name="txtCustomer" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Flat/Wing Number"/>
+                        <TextBox x:Name="txtFlat" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Car Brand/Model"/>
+                        <TextBox x:Name="txtCarModel" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Car Number Plate *"/>
+                        <TextBox x:Name="txtCarNumber" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Car Type"/>
+                        <TextBox x:Name="txtCarType" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Monthly Subscription Fee"/>
+                        <TextBox x:Name="txtPlan" Text="₹500" Margin="0,0,0,10"/>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                            <Button Content="Subscribe" x:Name="btnSubscribe" Width="120" Margin="5" Background="#10B981" Foreground="White"/>
+                            <Button Content="Update" x:Name="btnUpdate" Width="120" Margin="5" Background="#3B82F6" Foreground="White"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Right Side: Subscriptions Table -->
+                <Border Grid.Column="1" Background="White" CornerRadius="10" Padding="20">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Grid.Row="0" Text="Car Washing Subscriptions" 
+                                   FontSize="18" FontWeight="Bold" Margin="0,0,0,10"/>
+
+                        <!-- Search bar -->
+                        <Grid Grid.Row="1" Margin="0,0,0,10" Width="220" HorizontalAlignment="Left">
+                            <TextBox x:Name="SearchBox"
+                                     Height="28"
+                                     VerticalContentAlignment="Center"
+                                     TextChanged="SearchBox_TextChanged"
+                                     GotFocus="SearchBox_GotFocus"
+                                     LostFocus="SearchBox_LostFocus"/>
+                            <TextBlock x:Name="SearchPlaceholder"
+                                       Text="Search..."
+                                       Foreground="Gray"
+                                       Margin="5,0,0,0"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       Visibility="Visible"/>
+                        </Grid>
+
+                        <!-- DataGrid (scrollable) -->
+                        <DataGrid Grid.Row="2" x:Name="dgSubscriptions" 
+                                  AutoGenerateColumns="False" 
+                                  CanUserAddRows="False"
+                                  HeadersVisibility="Column" 
+                                  RowHeight="35"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  GridLinesVisibility="Horizontal"
+                                  BorderThickness="1"
+                                  BorderBrush="#E5E7EB"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Customer ID" Binding="{Binding CustomerID}" Width="100"/>
+                                <DataGridTextColumn Header="Customer" Binding="{Binding Customer}" Width="150"/>
+                                <DataGridTextColumn Header="Society" Binding="{Binding Society}" Width="180"/>
+                                <DataGridTextColumn Header="Car Details" Binding="{Binding CarDetails}" Width="220"/>
+                                <DataGridTextColumn Header="Plan" Binding="{Binding Plan}" Width="120"/>
+                                <DataGridTextColumn Header="Washer" Binding="{Binding Washer}" Width="150"/>
+                                <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                                <DataGridTextColumn Header="Next Due" Binding="{Binding NextDue}" Width="120"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Window>

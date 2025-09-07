@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EmployeeManagerWPF.Models;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -59,7 +60,7 @@ namespace NewCustomerWindow
             _invoice.CustomerName = txtCustomer.Text;
             _invoice.InvoiceType = (cmbType.SelectedItem as ComboBoxItem)?.Content.ToString();
             _invoice.Description = txtDescription.Text;
-            _invoice.Amount = double.TryParse(txtAmount.Text, out double amt) ? amt : 0;
+            _invoice.Amount = (decimal)(double.TryParse(txtAmount.Text, out double amt) ? amt : 0);
             _invoice.Status = (cmbStatus.SelectedItem as ComboBoxItem)?.Content.ToString();
             _invoice.InvoiceDate = dpDate.SelectedDate.Value;
 

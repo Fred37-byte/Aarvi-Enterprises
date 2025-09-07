@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NewCustomerWindow.xaml"
         mc:Ignorable="d"
-        Title="WaterServiceWindow" Height="450" Width="930">
+        Title="WaterServiceWindow" Height="450" Width="1100">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -46,6 +46,7 @@
                     VerticalAlignment="Top" BorderBrush="#DDD" BorderThickness="1">
                 <StackPanel>
 
+                 
                     <!-- Brand -->
                     <TextBlock Text="Brand:" FontWeight="Bold" Margin="0,0,0,5"/>
                     <ComboBox Name="BrandCombo" Height="30" Margin="0,0,0,10">
@@ -87,10 +88,13 @@
                       CanUserAddRows="False" Margin="0,0,0,0"
                       SelectionMode="Single" SelectionUnit="FullRow">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Brand" Binding="{Binding Brand}" Width="150"/>
-                    <DataGridTextColumn Header="Quantity" Binding="{Binding Quantity}" Width="150"/>
-                    <DataGridTextColumn Header="Units" Binding="{Binding Units}" Width="100"/>
-                    <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="*"/>
+                    <DataGridTextColumn Header="Invoice Id" Binding="{Binding InvoiceId}" Width="80"/>
+                    <DataGridTextColumn Header=" Customer" Binding="{Binding Customer}" Width="150"/>
+                    
+                    <DataGridTextColumn Header=" Brand" Binding="{Binding Brand}" Width="150"/>
+                    <DataGridTextColumn Header=" Quantity" Binding="{Binding Quantity}" Width="150"/>
+                    <DataGridTextColumn Header=" Units" Binding="{Binding Units}" Width="100"/>
+                    <DataGridTextColumn Header=" Address" Binding="{Binding Address}" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

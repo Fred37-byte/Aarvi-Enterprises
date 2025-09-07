@@ -38,7 +38,11 @@ namespace NewCustomerWindow.xaml
 
 
 
-
+        private void OpenCarWashingWindow(object sender, RoutedEventArgs e)
+        {
+            CarWashingWindow carWindow = new CarWashingWindow();
+            carWindow.Show();   // or ShowDialog() if you want it modal
+        }
 
         private void BtnInvoices_Click(object sender, RoutedEventArgs e)
         {

@@ -167,6 +167,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CarWashingWindow.xaml.cs">
+      <DependentUpon>CarWashingWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Class\Customer.cs" />
     <Compile Include="Class\CustomerService.cs" />
     <Compile Include="Class\CustomFontResolver.cs" />
@@ -207,6 +210,10 @@
     <Compile Include="WaterServiceWindow.xaml.cs">
       <DependentUpon>WaterServiceWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="CarWashingWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="EditInvoiceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

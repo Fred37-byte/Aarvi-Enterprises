@@ -62,23 +62,29 @@
                Margin="0 0 0 10"/>
         </StackPanel>
 
-        <!-- DataGrid in Center -->
         <DataGrid x:Name="InvoiceGrid"
-              Grid.Row="1"
-              AutoGenerateColumns="False"
-              IsReadOnly="True"
-              CanUserAddRows="False"
-              HeadersVisibility="Column"
-              HorizontalScrollBarVisibility="Auto"
-              Margin="0 0 0 20">
+          Grid.Row="1"
+          AutoGenerateColumns="False"
+          IsReadOnly="True"
+          CanUserAddRows="False"
+          HeadersVisibility="Column"
+          HorizontalScrollBarVisibility="Auto"
+          Margin="0 0 0 20">
+
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Ref" Binding="{Binding Id}" Width="60"/>
+               
+                <!-- New Columns -->
+                <DataGridTextColumn Header="Invoice Id" Binding="{Binding InvoiceId}" Width="100"/>
+                <DataGridTextColumn Header="Customer Id" Binding="{Binding CustomerId}" Width="100"/>
+
                 <DataGridTextColumn Header="Date" Binding="{Binding InvoiceDate, StringFormat='dd-MM-yyyy'}"/>
                 <DataGridTextColumn Header="Type" Binding="{Binding InvoiceType}" Width="150"/>
                 <DataGridTextColumn Header="Customer" Binding="{Binding CustomerName}" Width="150"/>
                 <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
                 <DataGridTextColumn Header="Total" Binding="{Binding Amount, StringFormat=₹{0:N2}}" Width="100"/>
                 <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="*"/>
+
+                <!-- Actions Column -->
                 <DataGridTemplateColumn Header="Actions" Width="130">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -92,6 +98,7 @@
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
+
 
         <!-- Export Button in Bottom-Right -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">

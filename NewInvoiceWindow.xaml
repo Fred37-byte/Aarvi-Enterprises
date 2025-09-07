@@ -57,7 +57,7 @@
                 <!-- Invoice Type -->
                 <StackPanel Margin="0 8">
                     <TextBlock Text="Invoice Type" FontWeight="Bold" FontSize="13"/>
-                    <ComboBox x:Name="InvoiceTypeBox" Height="30" Padding="3">
+                    <ComboBox x:Name="InvoiceTypeBox" Height="30" Padding="3" SelectionChanged="InvoiceTypeBox_SelectionChanged">
                         <ComboBoxItem Content="Service Invoice"/>
                         <ComboBoxItem Content="Product Invoice"/>
                     </ComboBox>

@@ -1,122 +1,166 @@
-﻿using PdfSharp.Pdf;
-using PdfSharp.Drawing;
-using PdfSharp.Fonts;
+﻿using System;
+using System.Configuration;
+using System.Data.SqlClient;
 using System.Diagnostics;
-using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Windows;
-using System.Windows.Controls;
+using EmployeeManagerWPF.Models;
+using Microsoft.Win32;
+using PdfSharp.Drawing;
+using PdfSharp.Pdf;
+using NewCustomerWindow.xaml.Class; // WaterServices
 
 namespace NewCustomerWindow.xaml
 {
     public partial class ViewInvoiceWindow : Window
     {
-        private Customer _customer;
-        private List<Invoice> _invoices;
+        private Invoice _invoice;
+        private readonly string _connStr = ConfigurationManager.ConnectionStrings["EmployeeDB"].ConnectionString;
 
-        public ViewInvoiceWindow(Customer customer, List<Invoice> invoices)
+        // ✅ Constructor now takes the full Invoice (already loaded via InvoiceService)
+        public ViewInvoiceWindow(Invoice invoice)
         {
             InitializeComponent();
-            _customer = customer;
-            _invoices = invoices;
 
-            // Register font resolver (only once globally!)
-            if (GlobalFontSettings.FontResolver == null)
-                GlobalFontSettings.FontResolver = new CustomFontResolver();
+            _invoice = invoice ?? throw new ArgumentNullException(nameof(invoice));
 
-            LoadCustomerInfo(customer);
-            invoiceGrid.ItemsSource = invoices;
+            // Safety net: if WaterDetails wasn't loaded, try to load it here.
+            if (_invoice.WaterDetails == null)
+                _invoice.WaterDetails = TryLoadWaterDetails(_invoice.InvoiceId);
+
+            DataContext = _invoice;
         }
 
-        private void LoadCustomerInfo(Customer customer)
+        private WaterServices TryLoadWaterDetails(int invoiceId)
         {
-            txtName.Text = customer.FullName;
-            txtEmail.Text = customer.Email;
-            txtPhone.Text = customer.Phone;
-            txtAddress.Text = $"{customer.Address}, {customer.City}, {customer.State} - {customer.ZipCode}";
+            try
+            {
+                using (var conn = new SqlConnection(_connStr))
+                using (var cmd = new SqlCommand(@"
+                    SELECT TOP 1 WaterInvoiceId, InvoiceId, DeliveryDate, Brand, Quantity, Units, Address
+                    FROM WaterOrders
+                    WHERE InvoiceId = @InvoiceId", conn))
+                {
+                    cmd.Parameters.AddWithValue("@InvoiceId", invoiceId);
+                    conn.Open();
+                    using (var r = cmd.ExecuteReader())
+                    {
+                        if (r.Read())
+                        {
+                            return new WaterServices
+                            {
+                                OrderID = (int)r["WaterInvoiceId"],
+                                InvoiceId = (int)r["InvoiceId"],
+                                DeliveryDate = r.GetDateTime(r.GetOrdinal("DeliveryDate")),
+                                Brand = r["Brand"].ToString(),
+                                Quantity = r["Quantity"].ToString(),
+                                Units = Convert.ToInt32(r["Units"]),
+                                Address = r["Address"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // swallow; UI will just hide the section if null
+            }
+            return null;
         }
 
-        private void Close_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
+        private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
         private void DownloadPdf_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog dlg = new SaveFileDialog
+            if (_invoice == null)
+            {
+                MessageBox.Show("No invoice loaded!", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
+            var dlg = new SaveFileDialog
             {
                 Filter = "PDF Document (*.pdf)|*.pdf",
-                FileName = $"Invoice_{_customer.FullName.Replace(" ", "_")}.pdf"
+                FileName = $"Invoice_{_invoice.InvoiceId}.pdf"
             };
 
             if (dlg.ShowDialog() == true)
             {
                 try
                 {
-                    PdfDocument doc = new PdfDocument();
-                    doc.Info.Title = "Customer Invoice";
+                    var doc = new PdfDocument();
+                    doc.Info.Title = "Invoice";
 
-                    PdfPage page = doc.AddPage();
-                    XGraphics gfx = XGraphics.FromPdfPage(page);
+                    var page = doc.AddPage();
+                    var gfx = XGraphics.FromPdfPage(page);
 
-                    // ✅ PDFsharp 6.2 - Use XFontOptions with XFontStyleEx
-                    var titleFont = new XFont("OpenSans", 16, XFontStyleEx.Bold, new XPdfFontOptions(PdfFontEncoding.Unicode));
-                    var labelFont = new XFont("OpenSans", 12, XFontStyleEx.Regular, new XPdfFontOptions(PdfFontEncoding.Unicode));
-                    var tableFont = new XFont("OpenSans", 10, XFontStyleEx.Regular, new XPdfFontOptions(PdfFontEncoding.Unicode));
+                    var titleFont = new XFont("Arial", 16, XFontStyleEx.Bold);
+                    var labelFont = new XFont("Arial", 12, XFontStyleEx.Bold);
+                    var textFont = new XFont("Arial", 12, XFontStyleEx.Regular);
 
-                    double yValue = 40;
+                    double y = 40;
 
-                    // Title
-                    gfx.DrawString("Customer Invoice Report", titleFont, XBrushes.Black,
-                        new XRect(XUnit.FromPoint(0), XUnit.FromPoint(yValue), page.Width, XUnit.FromPoint(30)),
-                        XStringFormats.TopCenter);
-                    yValue += 40;
+                    // Header
+                    gfx.DrawString("AARVI ENTERPRISES", titleFont, XBrushes.Black,
+                        new XRect(0, y, page.Width.Point, 30), XStringFormats.TopCenter);
+                    y += 30;
 
-                    // Customer Info
-                    gfx.DrawString($"Name: {_customer.FullName}", labelFont, XBrushes.Black, XUnit.FromPoint(40), XUnit.FromPoint(yValue)); yValue += 20;
-                    gfx.DrawString($"Email: {_customer.Email}", labelFont, XBrushes.Black, XUnit.FromPoint(40), XUnit.FromPoint(yValue)); yValue += 20;
-                    gfx.DrawString($"Phone: {_customer.Phone}", labelFont, XBrushes.Black, XUnit.FromPoint(40), XUnit.FromPoint(yValue)); yValue += 20;
-                    gfx.DrawString($"Address: {_customer.Address}, {_customer.City}, {_customer.State} - {_customer.ZipCode}", labelFont, XBrushes.Black, XUnit.FromPoint(40), XUnit.FromPoint(yValue)); yValue += 30;
+                    gfx.DrawString("Waghbil, Thane, Maharashtra • +91-9987064748 • aarvienterprises@gmail.com",
+                        textFont, XBrushes.Black, new XRect(0, y, page.Width.Point, 20), XStringFormats.TopCenter);
+                    y += 30;
 
-                    // Table Header
-                    gfx.DrawString("Date", tableFont, XBrushes.Black, XUnit.FromPoint(40), XUnit.FromPoint(yValue));
-                    gfx.DrawString("Type", tableFont, XBrushes.Black, XUnit.FromPoint(110), XUnit.FromPoint(yValue));
-                    gfx.DrawString("Description", tableFont, XBrushes.Black, XUnit.FromPoint(240), XUnit.FromPoint(yValue));
-                    gfx.DrawString("Amount", tableFont, XBrushes.Black, XUnit.FromPoint(400), XUnit.FromPoint(yValue));
-                    gfx.DrawString("Status", tableFont, XBrushes.Black, XUnit.FromPoint(480), XUnit.FromPoint(yValue));
-                    yValue += 15;
+                    // Invoice Details
+                    gfx.DrawString("Invoice Details", labelFont, XBrushes.Black, 40, y); y += 20;
 
-                    gfx.DrawLine(XPens.Black, XUnit.FromPoint(40), XUnit.FromPoint(yValue), page.Width - XUnit.FromPoint(40), XUnit.FromPoint(yValue));
-                    yValue += 10;
+                    gfx.DrawString("Invoice No:", labelFont, XBrushes.Black, 40, y);
+                    gfx.DrawString(_invoice.InvoiceId.ToString(), textFont, XBrushes.Black, 140, y); y += 18;
 
-                    // Table Rows
-                    foreach (var inv in _invoices)
+                    gfx.DrawString("Date:", labelFont, XBrushes.Black, 40, y);
+                    gfx.DrawString(_invoice.InvoiceDate.ToShortDateString(), textFont, XBrushes.Black, 140, y); y += 18;
+
+                    gfx.DrawString("Customer:", labelFont, XBrushes.Black, 40, y);
+                    gfx.DrawString(_invoice.CustomerName ?? "-", textFont, XBrushes.Black, 140, y); y += 18;
+
+                    gfx.DrawString("Type:", labelFont, XBrushes.Black, 40, y);
+                    gfx.DrawString(_invoice.InvoiceType ?? "-", textFont, XBrushes.Black, 140, y); y += 18;
+
+                    gfx.DrawString("Description:", labelFont, XBrushes.Black, 40, y);
+                    gfx.DrawString(_invoice.Description ?? "-", textFont, XBrushes.Black, 140, y); y += 18;
+
+                    gfx.DrawString("Amount:", labelFont, XBrushes.Black, 40, y);
+                    gfx.DrawString($"₹{_invoice.Amount:N2}", textFont, XBrushes.Black, 140, y); y += 18;
+
+                    gfx.DrawString("Status:", labelFont, XBrushes.Black, 40, y);
+                    gfx.DrawString(_invoice.Status ?? "-", textFont, XBrushes.Black, 140, y); y += 25;
+
+                    // Water Supply (only if present)
+                    if (_invoice.WaterDetails != null)
                     {
-                        gfx.DrawString(inv.InvoiceDate.ToShortDateString(), tableFont, XBrushes.Black, XUnit.FromPoint(40), XUnit.FromPoint(yValue));
-                        gfx.DrawString(inv.InvoiceType, tableFont, XBrushes.Black, XUnit.FromPoint(110), XUnit.FromPoint(yValue));
-                        gfx.DrawString(inv.Description, tableFont, XBrushes.Black, XUnit.FromPoint(240), XUnit.FromPoint(yValue));
-                        gfx.DrawString($"₹{inv.Amount:N2}", tableFont, XBrushes.Black, XUnit.FromPoint(400), XUnit.FromPoint(yValue));
-                        gfx.DrawString(inv.Status, tableFont, XBrushes.Black, XUnit.FromPoint(480), XUnit.FromPoint(yValue));
-                        yValue += 20;
+                        gfx.DrawString("Water Supply Details", labelFont, XBrushes.Black, 40, y); y += 20;
 
-                        // Page overflow check
-                        if (yValue > page.Height.Point - 40)
-                        {
-                            page = doc.AddPage();
-                            gfx = XGraphics.FromPdfPage(page);
-                            yValue = 40;
-                        }
+                        gfx.DrawString("Brand:", labelFont, XBrushes.Black, 40, y);
+                        gfx.DrawString(_invoice.WaterDetails.Brand ?? "-", textFont, XBrushes.Black, 140, y); y += 18;
+
+                        gfx.DrawString("Quantity:", labelFont, XBrushes.Black, 40, y);
+                        gfx.DrawString(_invoice.WaterDetails.Quantity ?? "-", textFont, XBrushes.Black, 140, y); y += 18;
+
+                        gfx.DrawString("Units:", labelFont, XBrushes.Black, 40, y);
+                        gfx.DrawString(_invoice.WaterDetails.Units.ToString(), textFont, XBrushes.Black, 140, y); y += 18;
+
+                        gfx.DrawString("Address:", labelFont, XBrushes.Black, 40, y);
+                        gfx.DrawString(_invoice.WaterDetails.Address ?? "-", textFont, XBrushes.Black, 140, y); y += 18;
                     }
 
+                    // Save + Open
                     doc.Save(dlg.FileName);
-                    MessageBox.Show("PDF downloaded successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("PDF downloaded successfully!", "Success",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                     Process.Start("explorer.exe", $"/select,\"{dlg.FileName}\"");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Error generating PDF: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Error generating PDF: " + ex.Message,
+                        "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
         }

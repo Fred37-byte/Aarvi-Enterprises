@@ -93,12 +93,15 @@
 
 
                     <!-- Aarvi Car Washing Service -->
-                    <StackPanel Orientation="Horizontal" Margin="5">
-                        <Image Source="Assets/car.jpg" Height="20" Width="20" Margin="0,0,10,0"/>
-                        <TextBlock Text="Aarvi Car Washing Service" Style="{StaticResource ServiceText}"
-                                   ToolTip="Professional car cleaning at your doorstep."
-                                   ToolTipService.InitialShowDelay="0"/>
-                    </StackPanel>
+                    <Button Background="Transparent" BorderThickness="0" Padding="0"
+        Click="OpenCarWashingWindow">
+                        <StackPanel Orientation="Horizontal" Margin="5">
+                            <Image Source="Assets/car.jpg" Height="20" Width="20" Margin="0,0,10,0"/>
+                            <TextBlock Text="Aarvi Car Washing Service" Style="{StaticResource ServiceText}"
+                   ToolTip="Professional car cleaning at your doorstep."
+                   ToolTipService.InitialShowDelay="0"/>
+                        </StackPanel>
+                    </Button>
 
                     <!-- Aarvi Laundry Service -->
                     <StackPanel Orientation="Horizontal" Margin="5">

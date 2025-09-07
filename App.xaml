@@ -1,9 +1,8 @@
 ﻿<Application x:Class="NewCustomerWindow.xaml.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:NewCustomerWindow.xaml"
              StartupUri="IndexLandingPage.xaml">
     <Application.Resources>
-         
+        <!-- Empty for now, no converters needed -->
     </Application.Resources>
 </Application>
