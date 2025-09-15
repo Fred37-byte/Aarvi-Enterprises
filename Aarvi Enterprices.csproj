@@ -167,12 +167,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AddSocietyCarWindow.xaml.cs">
+      <DependentUpon>AddSocietyCarWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CarWashingSocietiesOverview.xaml.cs">
+      <DependentUpon>CarWashingSocietiesOverview.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CarWashingWindow.xaml.cs">
       <DependentUpon>CarWashingWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Class\Customer.cs" />
     <Compile Include="Class\CustomerService.cs" />
     <Compile Include="Class\CustomFontResolver.cs" />
+    <Compile Include="Class\Society.cs" />
     <Compile Include="Class\WaterServices.cs" />
     <Compile Include="EditInvoiceWindow.xaml.cs">
       <DependentUpon>EditInvoiceWindow.xaml</DependentUpon>
@@ -210,6 +217,14 @@
     <Compile Include="WaterServiceWindow.xaml.cs">
       <DependentUpon>WaterServiceWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="AddSocietyCarWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CarWashingSocietiesOverview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CarWashingWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

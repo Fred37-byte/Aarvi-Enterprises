@@ -1,0 +1,133 @@
+﻿<Window x:Class="NewCustomerWindow.xaml.CarWashingSocietiesOverview"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NewCustomerWindow.xaml"
+        mc:Ignorable="d"
+        Title="CarWashingSocietiesOverview" Height="600" Width="1000"
+        Background="#F7F7F9">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="20">
+
+            <!-- Header -->
+            <DockPanel LastChildFill="False" Margin="0,0,0,20">
+                <StackPanel DockPanel.Dock="Top">
+
+                    <TextBlock Text="🏢 Society Management Dashboard"
+                       FontSize="22" FontWeight="Bold"
+                       Foreground="#4F46E5" 
+                       HorizontalAlignment="Center" Margin="0,10"/>
+                    <TextBlock  HorizontalAlignment="Center"> Manage societies and track car washing subscriptions</TextBlock>
+                </StackPanel>
+
+            </DockPanel>
+
+            <!-- Stats Boxes -->
+            <UniformGrid Columns="4" Margin="0,0,0,30">
+                <Border Background="White" CornerRadius="12" Padding="20" Margin="10" BorderBrush="#E5E7EB" BorderThickness="1">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="12" x:Name="txtActiveSocieties" FontSize="26" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Active Societies" FontSize="14" Foreground="Gray" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" CornerRadius="12" Padding="20" Margin="10" BorderBrush="#E5E7EB" BorderThickness="1">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="156" x:Name="txtSubscribedCars" FontSize="26" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Subscribed Cars" FontSize="14" Foreground="Gray" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" CornerRadius="12" Padding="20" Margin="10" BorderBrush="#E5E7EB" BorderThickness="1">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="8" x:Name="txtCarWashers" FontSize="26" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Car Washers" FontSize="14" Foreground="Gray" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Background="White" CornerRadius="12" Padding="20" Margin="10" BorderBrush="#E5E7EB" BorderThickness="1">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock Text="₹78,000" x:Name="txtRevenue" FontSize="26" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Monthly Revenue" FontSize="14" Foreground="Gray" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+                
+            </UniformGrid>
+            <Button Content="+ Add New Society"
+                    HorizontalAlignment="Right"
+                    Background="Green" Foreground="White"
+                    Padding="10,5" Margin="0 0 20 0"
+                    Click="BtnAddSociety_Click"/>
+
+
+
+            <!-- Cards container -->
+            <ItemsControl x:Name="SocietyList">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True" Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#DDD" BorderThickness="1"
+                                CornerRadius="12" Background="White"
+                                Width="280" Height="220" Margin="10" Padding="15">
+                            <Border.Effect>
+                                <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="2" Opacity="0.2"/>
+                            </Border.Effect>
+
+                            <StackPanel>
+                                <!-- Society Name -->
+                                <TextBlock Text="{Binding SocietyName}"
+                                           FontSize="16" FontWeight="Bold"
+                                           Margin="0 0 0 8"/>
+
+                                <!-- Address -->
+                                <TextBlock Text="{Binding Address}" 
+                                           FontSize="12" Foreground="Gray"
+                                           TextWrapping="Wrap"/>
+
+                                <!-- Phone -->
+                                <TextBlock Text="{Binding Phone}" 
+                                           FontSize="12" Foreground="Gray"/>
+
+                                <!-- Manager -->
+                                <TextBlock Text="Society Manager:" FontWeight="Bold"
+                                           FontSize="12" Margin="0,5,0,0"/>
+                                <TextBlock Text="{Binding ManagerName}" 
+                                           FontSize="12" Foreground="Gray"/>
+
+                                <!-- Stats -->
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,10" HorizontalAlignment="Center">
+                                    <StackPanel Margin="10,0">
+                                        <TextBlock Text="{Binding ActiveCars}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Active Cars" FontSize="11" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="10,0">
+                                        <TextBlock Text="{Binding MonthlyRevenue}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Revenue" FontSize="11" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Margin="10,0">
+                                        <TextBlock Text="{Binding Satisfaction}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <TextBlock Text="Satisfaction" FontSize="11" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+
+                                <!-- Buttons -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <Button Content="View Details" Margin="5" Padding="10,5"/>
+                                    <Button Content="Edit" Margin="5" Padding="10,5"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+        </StackPanel>
+    </ScrollViewer>
+</Window>
