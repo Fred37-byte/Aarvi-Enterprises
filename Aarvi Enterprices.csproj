@@ -170,6 +170,9 @@
     <Compile Include="AddSocietyCarWindow.xaml.cs">
       <DependentUpon>AddSocietyCarWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CarListWindow.xaml.cs">
+      <DependentUpon>CarListWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CarWashingSocietiesOverview.xaml.cs">
       <DependentUpon>CarWashingSocietiesOverview.xaml</DependentUpon>
     </Compile>
@@ -210,6 +213,15 @@
     <Compile Include="SplashWindow.xaml.cs">
       <DependentUpon>SplashWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="EditSociety.xaml.cs">
+      <DependentUpon>EditSociety.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UpdateCarWindow.xaml.cs">
+      <DependentUpon>UpdateCarWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewdetailSocieties.xaml.cs">
+      <DependentUpon>ViewdetailSocieties.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ViewInvoiceWindow.xaml.cs">
       <DependentUpon>ViewInvoiceWindow.xaml</DependentUpon>
     </Compile>
@@ -218,6 +230,10 @@
       <DependentUpon>WaterServiceWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="AddSocietyCarWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CarListWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -270,6 +286,18 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="EditSociety.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UpdateCarWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ViewdetailSocieties.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

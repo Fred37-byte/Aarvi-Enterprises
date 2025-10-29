@@ -12,15 +12,15 @@ namespace NewCustomerWindow
 {
     public partial class CarWashingWindow : Window
     {
-        private DataTable subscriptionsData;      // all records
-        private DataView filteredResults;         // filtered records
+        private DataTable subscriptionsData;
+        private DataView filteredResults;
 
         public CarWashingWindow()
         {
             InitializeComponent();
             LoadStats();
             LoadOrders();
-            LoadSocieties(); // 👈 Load societies when window opens
+            LoadSocieties();
         }
 
         private void LoadSocieties()
@@ -32,7 +32,7 @@ namespace NewCustomerWindow
                 using (SqlConnection conn = new SqlConnection(connStr))
                 {
                     conn.Open();
-                    string query = "SELECT SocietyName FROM CarWashingSocieties";
+                    string query = "SELECT SocietyId, SocietyName FROM CarWashingSocieties ORDER BY SocietyName";
 
                     SqlCommand cmd = new SqlCommand(query, conn);
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -41,7 +41,7 @@ namespace NewCustomerWindow
 
                     cmbSociety.ItemsSource = dt.DefaultView;
                     cmbSociety.DisplayMemberPath = "SocietyName";
-                    cmbSociety.SelectedValuePath = "SocietyName";
+                    cmbSociety.SelectedValuePath = "SocietyId";
                 }
             }
             catch (Exception ex)
@@ -65,9 +65,11 @@ namespace NewCustomerWindow
                         CustomerName as Customer, 
                         Society,
                         CONCAT(CarModel, ' (', CarNumber, ')') as CarDetails,
-                        Subscription as [Plan],
+                        Subscription as SubscriptionAmount,
+                        SubscriptionType,
                         Washer,
                         Status,
+                        FORMAT(OrderDate, 'dd-MM-yyyy') as StartDate,
                         FORMAT(NextDueDate, 'dd-MM-yyyy') as NextDue
                         FROM CarWashingOrders 
                         ORDER BY CarInvoiceId ASC";
@@ -75,6 +77,35 @@ namespace NewCustomerWindow
                     SqlDataAdapter da = new SqlDataAdapter(query, conn);
                     subscriptionsData = new DataTable();
                     da.Fill(subscriptionsData);
+
+                    // Add computed column for Plan display using SubscriptionType
+                    subscriptionsData.Columns.Add("Plan", typeof(string));
+
+                    foreach (DataRow row in subscriptionsData.Rows)
+                    {
+                        string amount = row["SubscriptionAmount"]?.ToString() ?? "0";
+                        string type = row["SubscriptionType"]?.ToString();
+
+                        // If SubscriptionType is NULL or empty, determine from amount (for old records)
+                        if (string.IsNullOrWhiteSpace(type))
+                        {
+                            if (decimal.TryParse(amount, out decimal amountValue))
+                            {
+                                if (amountValue <= 300)
+                                    type = "Monthly";
+                                else if (amountValue <= 700)
+                                    type = "Quarterly";
+                                else
+                                    type = "Yearly";
+                            }
+                            else
+                            {
+                                type = "Monthly";
+                            }
+                        }
+
+                        row["Plan"] = $"₹{amount} ({type})";
+                    }
 
                     filteredResults = subscriptionsData.DefaultView;
                     dgSubscriptions.ItemsSource = filteredResults;
@@ -102,25 +133,23 @@ namespace NewCustomerWindow
                     int activeSocieties = Convert.ToInt32(cmdSocieties.ExecuteScalar());
 
                     // 2. Count Subscribed Cars
-                    string queryCars = "SELECT COUNT(*) FROM CarWashingOrders";
+                    string queryCars = "SELECT COUNT(*) FROM CarWashingOrders WHERE Status = 'Active'";
                     SqlCommand cmdCars = new SqlCommand(queryCars, conn);
                     int subscribedCars = Convert.ToInt32(cmdCars.ExecuteScalar());
 
                     // 3. Car Washers (count unique washers)
-                    string queryWashers = "SELECT COUNT(DISTINCT Washer) FROM CarWashingOrders WHERE Washer IS NOT NULL AND Washer != ''";
+                    string queryWashers = "SELECT COUNT(DISTINCT Washer) FROM CarWashingOrders WHERE Washer IS NOT NULL AND Washer != '' AND Status = 'Active'";
                     SqlCommand cmdWashers = new SqlCommand(queryWashers, conn);
                     int carWashers = Convert.ToInt32(cmdWashers.ExecuteScalar());
 
-                    // 4. Monthly Revenue - Fixed calculation with proper pricing
+                    // 4. Monthly Revenue (normalized MRR) - FIXED CALCULATION
                     decimal monthlyRevenue = CalculateMonthlyRevenue(conn);
 
                     // Update UI
                     txtActiveSocieties.Text = activeSocieties.ToString();
                     txtSubscribedCars.Text = subscribedCars.ToString();
+                    txtCarWashers.Text = carWashers.ToString();
                     txtRevenue.Text = "₹" + monthlyRevenue.ToString("N0");
-
-                    // Update car washers if you have a control for it
-                    // txtCarWashers.Text = carWashers.ToString();
                 }
                 catch (Exception ex)
                 {
@@ -129,18 +158,16 @@ namespace NewCustomerWindow
             }
         }
 
-        // ✅ NEW METHOD: Calculate monthly revenue with proper pricing logic
-        // ✅ FIXED METHOD: Calculate MONTHLY recurring revenue from Active subscriptions only
+        // FIXED: This method now matches the calculation in CarWashingSocietiesOverview
         private decimal CalculateMonthlyRevenue(SqlConnection conn)
         {
             try
             {
-                // Get only ACTIVE subscriptions grouped by plan type
+                // Read ACTUAL subscription amounts and types from database
                 string query = @"
-            SELECT Subscription, COUNT(*) as Count 
-            FROM CarWashingOrders 
-            WHERE Status = 'Active'
-            GROUP BY Subscription";
+                    SELECT Subscription, SubscriptionType 
+                    FROM CarWashingOrders 
+                    WHERE Status = 'Active'";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 SqlDataReader reader = cmd.ExecuteReader();
@@ -149,12 +176,30 @@ namespace NewCustomerWindow
 
                 while (reader.Read())
                 {
-                    string subscriptionType = reader["Subscription"]?.ToString()?.ToLower() ?? "";
-                    int count = Convert.ToInt32(reader["Count"]);
+                    // Get the actual subscription amount from database
+                    string subscriptionStr = reader["Subscription"]?.ToString() ?? "0";
+                    string subscriptionType = reader["SubscriptionType"]?.ToString() ?? "Monthly";
 
-                    // Convert each plan to its MONTHLY equivalent
-                    decimal monthlyRatePerSubscription = GetMonthlyEquivalentRate(subscriptionType);
-                    monthlyRevenue += monthlyRatePerSubscription * count;
+                    // Parse the actual amount
+                    if (decimal.TryParse(subscriptionStr, out decimal amount))
+                    {
+                        // Normalize to monthly revenue based on subscription type
+                        switch (subscriptionType.ToLower())
+                        {
+                            case "monthly":
+                                monthlyRevenue += amount; // Already monthly
+                                break;
+                            case "quarterly":
+                                monthlyRevenue += amount / 3; // Divide by 3 months
+                                break;
+                            case "yearly":
+                                monthlyRevenue += amount / 12; // Divide by 12 months
+                                break;
+                            default:
+                                monthlyRevenue += amount; // Default to monthly
+                                break;
+                        }
+                    }
                 }
 
                 reader.Close();
@@ -164,34 +209,6 @@ namespace NewCustomerWindow
             {
                 MessageBox.Show($"Error calculating monthly revenue: {ex.Message}");
                 return 0;
-            }
-        }
-
-        // ✅ FIXED METHOD: Convert subscription plans to monthly equivalent rates
-        private decimal GetMonthlyEquivalentRate(string subscriptionType)
-        {
-            switch (subscriptionType.ToLower())
-            {
-                case "monthly":
-                    return 500; // ₹500 per month
-
-                case "quarterly":
-                    return 1350 / 3; // ₹1350 ÷ 3 months = ₹450 per month
-
-                case "yearly":
-                    return 5000 / 12; // ₹5000 ÷ 12 months = ₹416.67 per month
-
-                case "premium":
-                    return 800; // ₹800 per month (assuming monthly billing)
-
-                case "basic":
-                    return 300; // ₹300 per month (assuming monthly billing)
-
-                default:
-                    // Try to parse if it's a direct number (assume it's monthly)
-                    if (decimal.TryParse(subscriptionType, out decimal amount))
-                        return amount;
-                    return 500; // Default monthly rate
             }
         }
 
@@ -206,15 +223,21 @@ namespace NewCustomerWindow
             else
             {
                 string escapedQuery = query.Replace("'", "''");
+
+                // Remove ₹ symbol if user typed it
+                string cleanQuery = escapedQuery.Replace("₹", "");
+
                 filteredResults.RowFilter = string.Format(
                     "Convert(Customer, 'System.String') LIKE '%{0}%' OR " +
                     "Convert(Society, 'System.String') LIKE '%{0}%' OR " +
                     "Convert(CarDetails, 'System.String') LIKE '%{0}%' OR " +
-                    "Convert([Plan], 'System.String') LIKE '%{0}%' OR " +
+                    "Convert(Plan, 'System.String') LIKE '%{0}%' OR " +
+                    "Convert(SubscriptionAmount, 'System.String') LIKE '%{1}%' OR " +
                     "Convert(Washer, 'System.String') LIKE '%{0}%' OR " +
                     "Convert(Status, 'System.String') LIKE '%{0}%' OR " +
+                    "Convert(StartDate, 'System.String') LIKE '%{0}%' OR " +
                     "Convert(NextDue, 'System.String') LIKE '%{0}%'",
-                    escapedQuery
+                    escapedQuery, cleanQuery
                 );
             }
         }
@@ -287,37 +310,46 @@ namespace NewCustomerWindow
                     string subscriptionType = (cmbSubscription.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Monthly";
                     DateTime nextDueDate = CalculateNextDueDate(subscriptionType);
 
+                    var selectedSociety = cmbSociety.SelectedItem as DataRowView;
+                    if (selectedSociety == null)
+                    {
+                        MessageBox.Show("Please select a society");
+                        return;
+                    }
+
+                    string societyName = selectedSociety["SocietyName"].ToString();
+                    int societyId = Convert.ToInt32(selectedSociety["SocietyId"]);
+
                     string query = @"INSERT INTO CarWashingOrders 
-                        (InvoiceId, CustomerId, Society, CustomerName, Flat, Mobile, CarModel, CarNumber, CarType, Subscription, Washer, Status, NextDueDate)
-                        VALUES (@InvoiceId, @CustomerId, @Society, @CustomerName, @Flat, @Mobile, @CarModel, @CarNumber, @CarType, @Subscription, @Washer, @Status, @NextDueDate)";
+                        (InvoiceId, CustomerId, Society, SocietyId, CustomerName, Flat, Mobile, CarModel, CarNumber, CarType, Subscription, SubscriptionType, Washer, Status, NextDueDate, OrderDate)
+                        VALUES (@InvoiceId, @CustomerId, @Society, @SocietyId, @CustomerName, @Flat, @Mobile, @CarModel, @CarNumber, @CarType, @Subscription, @SubscriptionType, @Washer, @Status, @NextDueDate, @OrderDate)";
 
                     SqlCommand cmd = new SqlCommand(query, conn);
 
                     cmd.Parameters.AddWithValue("@InvoiceId", 1);
                     cmd.Parameters.AddWithValue("@CustomerId", 1);
-
-                    cmd.Parameters.AddWithValue("@Society", cmbSociety.SelectedValue.ToString());
+                    cmd.Parameters.AddWithValue("@Society", societyName);
+                    cmd.Parameters.AddWithValue("@SocietyId", societyId);
                     cmd.Parameters.AddWithValue("@CustomerName", txtCustomer.Text.Trim());
                     cmd.Parameters.AddWithValue("@Flat", txtFlat.Text.Trim());
                     cmd.Parameters.AddWithValue("@Mobile", txtMobile.Text.Trim());
                     cmd.Parameters.AddWithValue("@CarModel", txtCarModel.Text.Trim());
                     cmd.Parameters.AddWithValue("@CarNumber", txtCarNumber.Text.Trim());
                     cmd.Parameters.AddWithValue("@CarType", txtCarType?.Text?.Trim() ?? "");
-                    cmd.Parameters.AddWithValue("@Subscription", txtSubscription?.Text?.Trim() ?? subscriptionType);
+                    cmd.Parameters.AddWithValue("@Subscription", txtSubscription?.Text?.Trim() ?? "");
+                    cmd.Parameters.AddWithValue("@SubscriptionType", subscriptionType);
                     cmd.Parameters.AddWithValue("@Washer", txtWasher?.Text?.Trim() ?? "");
                     cmd.Parameters.AddWithValue("@Status", (cmbStatus.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Pending");
                     cmd.Parameters.AddWithValue("@NextDueDate", nextDueDate);
+                    cmd.Parameters.AddWithValue("@OrderDate", DateTime.Today);
 
                     cmd.ExecuteNonQuery();
 
-                    MessageBox.Show($"Car subscription added successfully! ✅\nNext due date: {nextDueDate:dd-MM-yyyy}");
+                    MessageBox.Show($"Car subscription added successfully!\nNext due date: {nextDueDate:dd-MM-yyyy}");
 
                     ClearForm();
-
-                    // ✅ FIX: Refresh both orders AND stats after adding
                     LoadOrders();
-                    LoadStats(); // This was missing!
-                    LoadSocieties(); // Also refresh societies in case new one was added
+                    LoadStats();
                 }
             }
             catch (SqlException sqlEx)
@@ -345,7 +377,6 @@ namespace NewCustomerWindow
             cmbStatus.SelectedIndex = 0;
         }
 
-        // ✅ NEW METHOD: Call this method when a new society is added from another window
         public void RefreshData()
         {
             LoadStats();

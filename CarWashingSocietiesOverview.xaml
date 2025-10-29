@@ -119,9 +119,11 @@
 
                                 <!-- Buttons -->
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button Content="View Details" Margin="5" Padding="10,5"/>
-                                    <Button Content="Edit" Margin="5" Padding="10,5"/>
-                                </StackPanel>
+                                    <Button Content="View Details" Margin="5" Padding="10,5" Click="ViewDetailsButton_Click"/>
+                                    <Button Content="Edit" Margin="5" Padding="10,5" Click="BtnEditSociety_Click"/>
+
+
+                                </StackPanel> 
                             </StackPanel>
                         </Border>
                     </DataTemplate>
@@ -130,4 +132,4 @@
 
         </StackPanel>
     </ScrollViewer>
-</Window>
+</Window>

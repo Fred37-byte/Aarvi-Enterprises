@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
-using System.Data;
 using System.Data.SqlClient;
 using System.Windows;
+using System.Windows.Controls;
 
 namespace NewCustomerWindow.xaml
 {
@@ -19,11 +19,10 @@ namespace NewCustomerWindow.xaml
             SocietyList.ItemsSource = societies;
             connectionString = ConfigurationManager.ConnectionStrings["EmployeeDB"].ConnectionString;
 
-            LoadOverallStats(); // Load dashboard stats
-            LoadSocieties();    // Load society cards
+            LoadOverallStats();
+            LoadSocieties();
         }
 
-        // ✅ NEW METHOD: Load overall dashboard statistics
         private void LoadOverallStats()
         {
             try
@@ -32,25 +31,18 @@ namespace NewCustomerWindow.xaml
                 {
                     conn.Open();
 
-                    // 1. Count Active Societies
                     string querySocieties = "SELECT COUNT(*) FROM CarWashingSocieties";
-                    SqlCommand cmdSocieties = new SqlCommand(querySocieties, conn);
-                    int activeSocieties = Convert.ToInt32(cmdSocieties.ExecuteScalar());
+                    int activeSocieties = Convert.ToInt32(new SqlCommand(querySocieties, conn).ExecuteScalar());
 
-                    // 2. Count Active Subscribed Cars
                     string queryCars = "SELECT COUNT(*) FROM CarWashingOrders WHERE Status = 'Active'";
-                    SqlCommand cmdCars = new SqlCommand(queryCars, conn);
-                    int subscribedCars = Convert.ToInt32(cmdCars.ExecuteScalar());
+                    int subscribedCars = Convert.ToInt32(new SqlCommand(queryCars, conn).ExecuteScalar());
 
-                    // 3. Count Car Washers (unique active washers)
                     string queryWashers = "SELECT COUNT(DISTINCT Washer) FROM CarWashingOrders WHERE Status = 'Active' AND Washer IS NOT NULL AND Washer != ''";
-                    SqlCommand cmdWashers = new SqlCommand(queryWashers, conn);
-                    int carWashers = Convert.ToInt32(cmdWashers.ExecuteScalar());
+                    int carWashers = Convert.ToInt32(new SqlCommand(queryWashers, conn).ExecuteScalar());
 
-                    // 4. Calculate Monthly Revenue from Active subscriptions
+                    // FIXED: Now calculates normalized monthly revenue
                     decimal monthlyRevenue = CalculateOverallMonthlyRevenue(conn);
 
-                    // Update UI controls
                     txtActiveSocieties.Text = activeSocieties.ToString();
                     txtSubscribedCars.Text = subscribedCars.ToString();
                     txtCarWashers.Text = carWashers.ToString();
@@ -63,32 +55,52 @@ namespace NewCustomerWindow.xaml
             }
         }
 
-        // ✅ NEW METHOD: Calculate overall monthly revenue
+        // FIXED: Now properly normalizes revenue to monthly equivalent
         private decimal CalculateOverallMonthlyRevenue(SqlConnection conn)
         {
             try
             {
+                // Read ACTUAL subscription amounts and types from database
                 string query = @"
-                    SELECT Subscription, COUNT(*) as Count 
+                    SELECT Subscription, SubscriptionType 
                     FROM CarWashingOrders 
-                    WHERE Status = 'Active'
-                    GROUP BY Subscription";
+                    WHERE Status = 'Active'";
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 SqlDataReader reader = cmd.ExecuteReader();
 
-                decimal totalRevenue = 0;
+                decimal monthlyRevenue = 0;
 
                 while (reader.Read())
                 {
-                    string subscriptionType = reader["Subscription"]?.ToString()?.ToLower() ?? "";
-                    int count = Convert.ToInt32(reader["Count"]);
-                    decimal monthlyRate = GetMonthlyEquivalentRate(subscriptionType);
-                    totalRevenue += monthlyRate * count;
+                    // Get the actual subscription amount from database
+                    string subscriptionStr = reader["Subscription"]?.ToString() ?? "0";
+                    string subscriptionType = reader["SubscriptionType"]?.ToString() ?? "Monthly";
+
+                    // Parse the actual amount
+                    if (decimal.TryParse(subscriptionStr, out decimal amount))
+                    {
+                        // Normalize to monthly revenue based on subscription type
+                        switch (subscriptionType.ToLower())
+                        {
+                            case "monthly":
+                                monthlyRevenue += amount; // Already monthly
+                                break;
+                            case "quarterly":
+                                monthlyRevenue += amount / 3; // Divide by 3 months
+                                break;
+                            case "yearly":
+                                monthlyRevenue += amount / 12; // Divide by 12 months
+                                break;
+                            default:
+                                monthlyRevenue += amount; // Default to monthly
+                                break;
+                        }
+                    }
                 }
 
                 reader.Close();
-                return totalRevenue;
+                return monthlyRevenue;
             }
             catch (Exception ex)
             {
@@ -97,29 +109,29 @@ namespace NewCustomerWindow.xaml
             }
         }
 
-        // ✅ NEW METHOD: Get monthly equivalent rate for subscription types
-        private decimal GetMonthlyEquivalentRate(string subscriptionType)
+        // Calculate rating based on cars and revenue
+        private string CalculateRating(int activeCars, decimal monthlyRevenue)
         {
-            switch (subscriptionType.ToLower())
-            {
-                case "monthly":
-                    return 500; // ₹500 per month
-                case "quarterly":
-                    return 1350 / 3; // ₹450 per month
-                case "yearly":
-                    return 5000 / 12; // ₹417 per month
-                case "premium":
-                    return 800; // ₹800 per month
-                case "basic":
-                    return 300; // ₹300 per month
-                default:
-                    if (decimal.TryParse(subscriptionType, out decimal amount))
-                        return amount;
-                    return 500; // Default rate
-            }
+            if (activeCars == 0 && monthlyRevenue == 0)
+                return "N/A";
+
+            // Base rating 3.0
+            double rating = 3.0;
+
+            // Add up to 1.5 stars for cars (every 5 cars = +0.5)
+            rating += Math.Min(1.5, (activeCars / 5.0) * 0.5);
+
+            // Add up to 0.5 stars for revenue (every 2000 = +0.5)
+            rating += Math.Min(0.5, ((double)monthlyRevenue / 2000.0) * 0.5);
+
+            // Cap at 5.0
+            rating = Math.Min(5.0, rating);
+
+            // Convert to stars
+            int fullStars = (int)Math.Round(rating);
+            return new string('⭐', fullStars);
         }
 
-        // ✅ ENHANCED METHOD: Load societies with real calculated data
         private void LoadSocieties()
         {
             societies.Clear();
@@ -129,7 +141,6 @@ namespace NewCustomerWindow.xaml
                 {
                     conn.Open();
 
-                    // Get basic society info
                     string query = @"SELECT SocietyId, SocietyName, Address, ContactNumber, ManagerName 
                                      FROM CarWashingSocieties 
                                      ORDER BY SocietyName";
@@ -139,153 +150,163 @@ namespace NewCustomerWindow.xaml
                     {
                         while (reader.Read())
                         {
-                            string societyName = reader["SocietyName"].ToString();
+                            var societyId = Convert.ToInt32(reader["SocietyId"]);
+
+                            // Get data for this society AFTER closing the reader
+                            var societyName = reader["SocietyName"]?.ToString() ?? string.Empty;
+                            var address = reader["Address"]?.ToString() ?? string.Empty;
+                            var phone = reader["ContactNumber"]?.ToString() ?? string.Empty;
+                            var managerName = reader["ManagerName"]?.ToString() ?? string.Empty;
 
                             societies.Add(new Society
                             {
+                                SocietyId = societyId,
                                 SocietyName = societyName,
-                                Address = reader["Address"].ToString(),
-                                Phone = reader["ContactNumber"].ToString(),
-                                ManagerName = reader["ManagerName"].ToString(),
-                                ActiveCars = GetActiveCarsForSociety(societyName),
-                                MonthlyRevenue = "₹" + GetMonthlyRevenueForSociety(societyName).ToString("N0"),
-                                Satisfaction = CalculateSatisfactionForSociety(societyName)
+                                Address = address,
+                                Phone = phone,
+                                ManagerName = managerName,
+                                ActiveCars = 0,
+                                MonthlyRevenue = "₹0",
+                                Satisfaction = "N/A"
                             });
                         }
                     }
+
+                    // Now load stats for each society
+                    foreach (var society in societies)
+                    {
+                        int activeCars = GetActiveCarsForSociety(society.SocietyId, conn);
+                        decimal monthlyRevenue = GetMonthlyRevenueForSociety(society.SocietyId, conn);
+
+                        society.ActiveCars = activeCars;
+                        society.MonthlyRevenue = "₹" + monthlyRevenue.ToString("N0");
+                        society.Satisfaction = CalculateRating(activeCars, monthlyRevenue);
+                    }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error while loading societies: {ex.Message}", "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Error loading societies: {ex.Message}\n\nStack: {ex.StackTrace}",
+                    "Database Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        // ✅ NEW METHOD: Get active cars count for specific society
-        private int GetActiveCarsForSociety(string societyName)
+        private int GetActiveCarsForSociety(int societyId, SqlConnection conn)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-                    string query = "SELECT COUNT(*) FROM CarWashingOrders WHERE Society = @society AND Status = 'Active'";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@society", societyName);
-                    return Convert.ToInt32(cmd.ExecuteScalar());
-                }
+                string query = "SELECT COUNT(*) FROM CarWashingOrders WHERE SocietyId = @societyId AND Status = 'Active'";
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@societyId", societyId);
+
+                object result = cmd.ExecuteScalar();
+                return result != null ? Convert.ToInt32(result) : 0;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error getting active cars for {societyName}: {ex.Message}");
+                MessageBox.Show($"Error getting active cars for Society {societyId}: {ex.Message}");
                 return 0;
             }
         }
 
-        // ✅ NEW METHOD: Get monthly revenue for specific society
-        private decimal GetMonthlyRevenueForSociety(string societyName)
+        // FIXED: Now properly normalizes revenue to monthly equivalent for each society
+        private decimal GetMonthlyRevenueForSociety(int societyId, SqlConnection conn)
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
+                string query = @"
+                    SELECT Subscription, SubscriptionType 
+                    FROM CarWashingOrders 
+                    WHERE SocietyId = @societyId AND Status = 'Active'";
+
+                SqlCommand cmd = new SqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@societyId", societyId);
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                decimal societyRevenue = 0;
+
+                while (reader.Read())
                 {
-                    conn.Open();
-                    string query = @"
-                        SELECT Subscription, COUNT(*) as Count 
-                        FROM CarWashingOrders 
-                        WHERE Society = @society AND Status = 'Active'
-                        GROUP BY Subscription";
+                    string subscriptionStr = reader["Subscription"]?.ToString() ?? "0";
+                    string subscriptionType = reader["SubscriptionType"]?.ToString() ?? "Monthly";
 
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@society", societyName);
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    decimal societyRevenue = 0;
-
-                    while (reader.Read())
+                    if (decimal.TryParse(subscriptionStr, out decimal amount))
                     {
-                        string subscriptionType = reader["Subscription"]?.ToString()?.ToLower() ?? "";
-                        int count = Convert.ToInt32(reader["Count"]);
-                        decimal monthlyRate = GetMonthlyEquivalentRate(subscriptionType);
-                        societyRevenue += monthlyRate * count;
+                        // Normalize to monthly revenue based on subscription type
+                        switch (subscriptionType.ToLower())
+                        {
+                            case "monthly":
+                                societyRevenue += amount;
+                                break;
+                            case "quarterly":
+                                societyRevenue += amount / 3;
+                                break;
+                            case "yearly":
+                                societyRevenue += amount / 12;
+                                break;
+                            default:
+                                societyRevenue += amount;
+                                break;
+                        }
                     }
-
-                    reader.Close();
-                    return societyRevenue;
                 }
+
+                reader.Close();
+                return societyRevenue;
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error calculating revenue for {societyName}: {ex.Message}");
+                MessageBox.Show($"Error calculating revenue for Society {societyId}: {ex.Message}");
                 return 0;
             }
         }
 
-        // ✅ NEW METHOD: Calculate satisfaction rating for society (Fixed DBNull handling)
-        private string CalculateSatisfactionForSociety(string societyName)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    conn.Open();
-
-                    // Get total cars and active cars ratio for satisfaction
-                    string query = @"
-                        SELECT 
-                            COUNT(*) as TotalCars,
-                            SUM(CASE WHEN Status = 'Active' THEN 1 ELSE 0 END) as ActiveCars
-                        FROM CarWashingOrders 
-                        WHERE Society = @society";
-
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@society", societyName);
-                    SqlDataReader reader = cmd.ExecuteReader();
-
-                    if (reader.Read())
-                    {
-                        // ✅ FIX: Handle DBNull values properly
-                        int totalCars = reader["TotalCars"] != DBNull.Value ? Convert.ToInt32(reader["TotalCars"]) : 0;
-                        int activeCars = reader["ActiveCars"] != DBNull.Value ? Convert.ToInt32(reader["ActiveCars"]) : 0;
-
-                        reader.Close();
-
-                        if (totalCars == 0) return "N/A";
-
-                        // Calculate satisfaction based on active/total ratio
-                        double satisfactionRatio = (double)activeCars / totalCars;
-
-                        if (satisfactionRatio >= 0.9) return "⭐⭐⭐⭐⭐";
-                        if (satisfactionRatio >= 0.8) return "⭐⭐⭐⭐";
-                        if (satisfactionRatio >= 0.7) return "⭐⭐⭐";
-                        if (satisfactionRatio >= 0.6) return "⭐⭐";
-                        return "⭐";
-                    }
-
-                    reader.Close();
-                    return "N/A";
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error calculating satisfaction for {societyName}: {ex.Message}");
-                return "N/A";
-            }
-        }
-
-        // ✅ ENHANCED METHOD: Add society and refresh data
         private void BtnAddSociety_Click(object sender, RoutedEventArgs e)
         {
             AddSocietyCarWindow addSocietyWindow = new AddSocietyCarWindow();
             if (addSocietyWindow.ShowDialog() == true)
             {
-                // Refresh both stats and society cards after adding
                 LoadOverallStats();
                 LoadSocieties();
             }
         }
 
-        // ✅ NEW METHOD: Public method to refresh data from external calls
+        private void BtnEditSociety_Click(object sender, RoutedEventArgs e)
+        {
+            var society = (sender as FrameworkElement)?.DataContext as Society;
+            if (society != null)
+            {
+                EditSociety editWindow = new EditSociety(society);
+                if (editWindow.ShowDialog() == true)
+                {
+                    RefreshData();
+                }
+            }
+        }
+
+        private void ViewDetailsButton_Click(object sender, RoutedEventArgs e)
+        {
+            var society = (sender as FrameworkElement)?.DataContext as Society;
+            if (society != null)
+            {
+                try
+                {
+                    ViewdetailSocieties detailsWindow = new ViewdetailSocieties(society.SocietyId);
+                    detailsWindow.ShowDialog();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error opening society details: {ex.Message}", "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Unable to load society details. Please try again.", "Warning",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
         public void RefreshData()
         {
             LoadOverallStats();
@@ -293,9 +314,9 @@ namespace NewCustomerWindow.xaml
         }
     }
 
-    // ✅ ENHANCED Society model
     public class Society
     {
+        public int SocietyId { get; set; }
         public string SocietyName { get; set; }
         public string Address { get; set; }
         public string Phone { get; set; }
@@ -304,4 +325,4 @@ namespace NewCustomerWindow.xaml
         public string MonthlyRevenue { get; set; }
         public string Satisfaction { get; set; }
     }
-} 
+}

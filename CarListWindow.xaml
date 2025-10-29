@@ -1,0 +1,312 @@
+﻿<Window x:Class="NewCustomerWindow.xaml.CarListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Active Cars" Height="900" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Background="#F7F7F9">
+
+    <Window.Resources>
+        <Style x:Key="DataGridHeaderStyle" TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#4F46E5"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="BorderThickness" Value="0,0,1,0"/>
+            <Setter Property="BorderBrush" Value="#6366F1"/>
+        </Style>
+
+        <Style x:Key="DataGridCellStyle" TargetType="DataGridCell">
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Padding="{TemplateBinding Padding}" 
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#EEF2FF"/>
+                    <Setter Property="Foreground" Value="#1F2937"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="DataGridRowStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="White"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#F5F3FF"/>
+                </Trigger>
+                <MultiTrigger>
+                    <MultiTrigger.Conditions>
+                        <Condition Property="IsSelected" Value="False"/>
+                        <Condition Property="AlternationIndex" Value="1"/>
+                    </MultiTrigger.Conditions>
+                    <Setter Property="Background" Value="#FAFAFA"/>
+                </MultiTrigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+            <Button x:Name="BackButton" DockPanel.Dock="Left"
+                    Width="40" Height="40"
+                    Background="Transparent" BorderThickness="0"
+                    Cursor="Hand" VerticalAlignment="Top"
+                    Click="BackButton_Click">
+                <Path Data="M20 12H4M4 12L10 6M4 12L10 18"
+                      Stroke="#6B7280" StrokeThickness="2"
+                      Width="20" Height="20" Stretch="Uniform"/>
+            </Button>
+
+            <StackPanel Margin="15,0,0,0">
+                <TextBlock Text="🚗 Active Cars" 
+                           FontSize="28" FontWeight="Bold" 
+                           Foreground="#1F2937"/>
+                <TextBlock x:Name="SocietyNameText" 
+                           FontSize="15" Foreground="#6B7280" 
+                           Margin="0,5,0,0" Text="Society: Loading..."/>
+            </StackPanel>
+        </DockPanel>
+
+        <!-- Stats Section -->
+        <Border Grid.Row="1" Background="White" CornerRadius="12"
+        BorderBrush="#E5E7EB" BorderThickness="1" Padding="20" Margin="0,10,0,15">
+            <Border.Effect>
+                <DropShadowEffect Color="#E5E7EB" Direction="270" ShadowDepth="2" BlurRadius="8" Opacity="0.3"/>
+            </Border.Effect>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <!-- Active Cars -->
+                <StackPanel Margin="20,0">
+                    <TextBlock Text="Active Cars" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="ActiveCarsText" Text="0" FontSize="28" FontWeight="Bold" Foreground="#4F46E5" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <Border Width="1" Background="#E5E7EB" Margin="20,0"/>
+
+                <!-- Total Revenue (Raw Sum) -->
+                <StackPanel Margin="20,0">
+                    <TextBlock Text="Total Revenue" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="TotalMRRText" Text="₹0" FontSize="24" FontWeight="Bold" Foreground="#10B981" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <Border Width="1" Background="#E5E7EB" Margin="20,0"/>
+
+                <!-- Total MRR (Normalized Monthly) -->
+                <StackPanel Margin="20,0">
+                    <TextBlock Text="Total MRR" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="AvgRevenueText" Text="₹0" FontSize="24" FontWeight="Bold" Foreground="#F59E0B" HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <Border Width="1" Background="#E5E7EB" Margin="20,0"/>
+
+                <!-- Active Washers -->
+                <StackPanel Margin="20,0">
+                    <TextBlock Text="Active Washers" FontSize="12" Foreground="#6B7280" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="ActiveWashersText" Text="0" FontSize="28" FontWeight="Bold" Foreground="#3B82F6" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Alert Cards (shorter design) -->
+        <UniformGrid Grid.Row="2" Columns="3" Margin="0,0,0,15">
+            <Border x:Name="OverdueCard" Background="#FEE2E2" CornerRadius="8" Padding="10" Margin="5" Cursor="Hand" MouseDown="OverdueCard_MouseDown">
+                <StackPanel>
+                    <TextBlock Text="🔴 OVERDUE" FontSize="10" FontWeight="Bold" Foreground="#DC2626"/>
+                    <TextBlock x:Name="OverdueCountText" Text="0" FontSize="22" FontWeight="Bold" Foreground="#DC2626" Margin="0,2,0,0"/>
+                    <TextBlock Text="cars" FontSize="10" Foreground="#991B1B"/>
+                    <TextBlock x:Name="OverdueMRRText" Text="₹0/mo" FontSize="11" FontWeight="SemiBold" Foreground="#DC2626" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="DueSoonCard" Background="#FEF3C7" CornerRadius="8" Padding="10" Margin="5" Cursor="Hand" MouseDown="DueSoonCard_MouseDown">
+                <StackPanel>
+                    <TextBlock Text="🟡 DUE SOON" FontSize="10" FontWeight="Bold" Foreground="#D97706"/>
+                    <TextBlock x:Name="DueSoonCountText" Text="0" FontSize="22" FontWeight="Bold" Foreground="#D97706" Margin="0,2,0,0"/>
+                    <TextBlock Text="cars" FontSize="10" Foreground="#92400E"/>
+                    <TextBlock x:Name="DueSoonMRRText" Text="₹0/mo" FontSize="11" FontWeight="SemiBold" Foreground="#D97706" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <Border x:Name="ActiveCard" Background="#D1FAE5" CornerRadius="8" Padding="10" Margin="5" Cursor="Hand" MouseDown="ActiveCard_MouseDown">
+                <StackPanel>
+                    <TextBlock Text="🟢 ACTIVE" FontSize="10" FontWeight="Bold" Foreground="#059669"/>
+                    <TextBlock x:Name="ActiveStatusCountText" Text="0" FontSize="22" FontWeight="Bold" Foreground="#059669" Margin="0,2,0,0"/>
+                    <TextBlock Text="cars" FontSize="10" Foreground="#065F46"/>
+                    <TextBlock x:Name="ActiveMRRText" Text="₹0/mo" FontSize="11" FontWeight="SemiBold" Foreground="#059669" Margin="0,2,0,0"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- Filter Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,15">
+            <Button x:Name="FilterAllBtn" Content="All (0)" 
+            Padding="12,6" Margin="0,0,8,0" 
+            Background="#4F46E5" Foreground="White" 
+            BorderThickness="0"
+            Cursor="Hand" Click="FilterAllBtn_Click"/>
+
+            <Button x:Name="FilterOverdueBtn" 
+            Padding="12,6" Margin="0,0,8,0" 
+            Background="LightGray" Foreground="Black" 
+            BorderThickness="0"
+            Cursor="Hand" Click="FilterOverdueBtn_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="8" Height="8" Fill="#DC2626" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Overdue (0)" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="FilterDueSoonBtn" 
+            Padding="12,6" Margin="0,0,8,0" 
+            Background="LightGray" Foreground="Black" 
+            BorderThickness="0"
+            Cursor="Hand" Click="FilterDueSoonBtn_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="8" Height="8" Fill="#F59E0B" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Due Soon (0)" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="FilterActiveBtn" 
+            Padding="12,6" 
+            Background="LightGray" Foreground="Black" 
+            BorderThickness="0"
+            Cursor="Hand" Click="FilterActiveBtn_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="8" Height="8" Fill="#10B981" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Active (0)" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
+        <!-- Search Bar -->
+        <Border Grid.Row="4" Background="White" CornerRadius="10" BorderBrush="#E5E7EB" BorderThickness="1" Padding="12" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Path Grid.Column="0"
+                      Data="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+                      Stroke="#9CA3AF" StrokeThickness="2"
+                      Width="20" Height="20" Stretch="Uniform"
+                      Margin="8,0,12,0" VerticalAlignment="Center"/>
+
+                <TextBox x:Name="SearchTextBox" Grid.Column="1" FontSize="14" BorderThickness="0" Background="Transparent" VerticalContentAlignment="Center" Padding="0" TextChanged="SearchTextBox_TextChanged">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Foreground" Value="#1F2937"/>
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Background">
+                                        <Setter.Value>
+                                            <VisualBrush Stretch="None" AlignmentX="Left">
+                                                <VisualBrush.Visual>
+                                                    <TextBlock Text="Search by name, car, amount, status..."
+                                                               Foreground="#9CA3AF" FontSize="14"/>
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <Button x:Name="ClearSearchButton" Grid.Column="2" Width="28" Height="28"
+                        Background="Transparent" BorderThickness="0" Cursor="Hand"
+                        Visibility="Collapsed" Click="ClearSearchButton_Click" Margin="8,0,0,0">
+                    <Path Data="M6 18L18 6M6 6L18 18"
+                          Stroke="#9CA3AF" StrokeThickness="2"
+                          Width="16" Height="16" Stretch="Uniform"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- DataGrid with Context Menu -->
+        <Border Grid.Row="5" Background="White" CornerRadius="12"
+        BorderBrush="#E5E7EB" BorderThickness="1">
+            <DataGrid x:Name="CarsDataGrid" AutoGenerateColumns="False"
+              CanUserAddRows="False" IsReadOnly="True"
+              GridLinesVisibility="None" HeadersVisibility="Column"
+              SelectionMode="Single" Background="Transparent"
+              BorderThickness="0" Margin="1"
+              ColumnHeaderStyle="{StaticResource DataGridHeaderStyle}"
+              CellStyle="{StaticResource DataGridCellStyle}"
+              RowStyle="{StaticResource DataGridRowStyle}"
+              AlternationCount="2">
+
+                <!-- Context Menu for Right Click -->
+                <DataGrid.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="✏️ Update" Click="UpdateMenuItem_Click" FontSize="13" Padding="10,5"/>
+                        <Separator/>
+                        <MenuItem Header="🗑️ Delete" Click="DeleteMenuItem_Click" FontSize="13" Padding="10,5" Foreground="#DC2626"/>
+                    </ContextMenu>
+                </DataGrid.ContextMenu>
+
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Owner Name" Binding="{Binding CustomerName}" Width="1.5*" FontSize="13"/>
+                    <DataGridTextColumn Header="Car Details" Binding="{Binding CarDetails}" Width="1.5*" FontSize="13" FontWeight="SemiBold"/>
+                    <DataGridTextColumn Header="Subscription" Binding="{Binding SubscriptionDisplay}" Width="150" FontSize="13"/>
+                    <DataGridTextColumn Header="Washer" Binding="{Binding Washer}" Width="1*" FontSize="13"/>
+                    <DataGridTextColumn Header="Start Date" Binding="{Binding StartDateFormatted}" Width="120" FontSize="13"/>
+                    <DataGridTextColumn Header="Due Date" Binding="{Binding DueDateFormatted}" Width="120" FontSize="13"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="90" FontSize="13"/>
+                    <DataGridTemplateColumn Header="Payment Status" Width="170">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="10" Height="10" VerticalAlignment="Center" Margin="0,0,8,0">
+                                        <Ellipse.Style>
+                                            <Style TargetType="Ellipse">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="🔴 OVERDUE">
+                                                        <Setter Property="Fill" Value="#DC2626"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="🟡 DUE SOON">
+                                                        <Setter Property="Fill" Value="#F59E0B"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="🟢 ACTIVE">
+                                                        <Setter Property="Fill" Value="#10B981"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding PaymentStatus}" Value="⚪ ACTIVE">
+                                                        <Setter Property="Fill" Value="#10B981"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Ellipse.Style>
+                                    </Ellipse>
+                                    <TextBlock Text="{Binding PaymentStatusText}" VerticalAlignment="Center" FontSize="13"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</Window>

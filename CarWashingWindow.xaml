@@ -7,7 +7,6 @@
         WindowState="Maximized"
         Background="#F5F5F7">
 
-    <!-- Only vertical scroll for the main page -->
     <ScrollViewer VerticalScrollBarVisibility="Auto"
                   HorizontalScrollBarVisibility="Disabled">
 
@@ -80,9 +79,7 @@
                         <ComboBox x:Name="cmbSociety"
                            Margin="0,0,0,10"
                            DisplayMemberPath="SocietyName"
-                           SelectedValuePath="SocietyName"
                            SelectedIndex="0"/>
-
 
                         <TextBlock Text="Customer Name *"/>
                         <TextBox x:Name="txtCustomer" Margin="0,0,0,10"/>
@@ -119,20 +116,22 @@
                         <ComboBox x:Name="cmbStatus" Margin="0,0,0,10">
                             <ComboBoxItem Content="Pending"/>
                             <ComboBoxItem Content="Active"/>
-
                         </ComboBox>
-
-                        <!-- Order Date is auto (GETDATE in DB), so no need in UI unless you want a DatePicker -->
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
                             <Button Content="Subscribe" 
-        x:Name="btnSubscribe" 
-        Width="120" 
-        Margin="5" 
-        Background="#10B981" 
-        Foreground="White"
-        Click="btnSubscribe_Click"/>
-                            <Button Content="Update" x:Name="btnUpdate" Width="120" Margin="5" Background="#3B82F6" Foreground="White"/>
+                                    x:Name="btnSubscribe" 
+                                    Width="120" 
+                                    Margin="5" 
+                                    Background="#10B981" 
+                                    Foreground="White"
+                                    Click="btnSubscribe_Click"/>
+                            <Button Content="Update" 
+                                    x:Name="btnUpdate" 
+                                    Width="120" 
+                                    Margin="5" 
+                                    Background="#3B82F6" 
+                                    Foreground="White"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -187,6 +186,7 @@
                                 <DataGridTextColumn Header="Plan" Binding="{Binding Plan}" Width="120"/>
                                 <DataGridTextColumn Header="Washer" Binding="{Binding Washer}" Width="150"/>
                                 <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="120"/>
+                                <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate}" Width="120"/>
                                 <DataGridTextColumn Header="Next Due" Binding="{Binding NextDue}" Width="120"/>
                             </DataGrid.Columns>
                         </DataGrid>
