@@ -237,15 +237,11 @@ namespace NewCustomerWindow.xaml
         {
             if (CarsDataGrid.SelectedItem is CarOrder selectedCar)
             {
-                MessageBox.Show($"Update functionality for:\n\nCustomer: {selectedCar.CustomerName}\nCar: {selectedCar.CarDetails}\nID: {selectedCar.CarInvoiceId}\n\n(Update window will be implemented here)",
-                    "Update Car Subscription", MessageBoxButton.OK, MessageBoxImage.Information);
-
-                // TODO: Open update window with pre-filled data
-                // UpdateCarWindow updateWindow = new UpdateCarWindow(selectedCar.CarInvoiceId);
-                // if (updateWindow.ShowDialog() == true)
-                // {
-                //     LoadCarOrders(); // Refresh data
-                // }
+                UpdateCarWindow updateWindow = new UpdateCarWindow(selectedCar.CarInvoiceId, societyId);
+                if (updateWindow.ShowDialog() == true)
+                {
+                    LoadCarOrders(); // Refresh the data grid
+                }
             }
         }
 
@@ -394,6 +390,21 @@ namespace NewCustomerWindow.xaml
             UpdateFilterButtonStyles();
             ApplyFilter();
         }
+        // Add this new method for Generate Invoice
+        private void GenerateInvoiceMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            if (CarsDataGrid.SelectedItem is CarOrder selectedCar)
+            {
+                // Open the invoice generation window
+                CarInvoiceWindow invoiceWindow = new CarInvoiceWindow(selectedCar.CarInvoiceId);
+                invoiceWindow.ShowDialog();
+            }
+            else
+            {
+                MessageBox.Show("Please select a car to generate invoice.", "No Selection",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
@@ -457,6 +468,7 @@ namespace NewCustomerWindow.xaml
                     return "ACTIVE";
             }
         }
+
 
         public string Status
         {

@@ -170,6 +170,9 @@
     <Compile Include="AddSocietyCarWindow.xaml.cs">
       <DependentUpon>AddSocietyCarWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="CarInvoiceWindow.xaml.cs">
+      <DependentUpon>CarInvoiceWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CarListWindow.xaml.cs">
       <DependentUpon>CarListWindow.xaml</DependentUpon>
     </Compile>
@@ -230,6 +233,10 @@
       <DependentUpon>WaterServiceWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="AddSocietyCarWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="CarInvoiceWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

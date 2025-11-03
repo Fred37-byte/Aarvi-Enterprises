@@ -5,8 +5,388 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NewCustomerWindow.xaml"
         mc:Ignorable="d"
-        Title="UpdateCarWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="Update Car Subscription" 
+        WindowState="Maximized"
+        WindowStartupLocation="CenterScreen"
+        Background="#F9FAFB">
+
+    <Window.Resources>
+        <!-- Modern TextBox Style -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" 
+                                        Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#4F46E5"/>
+                </Trigger>
+                <Trigger Property="IsFocused" Value="True">
+                    <Setter Property="BorderBrush" Value="#4F46E5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Modern ComboBox Style -->
+        <Style x:Key="ModernComboBox" TargetType="ComboBox">
+            <Setter Property="Padding" Value="12,10"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="BorderBrush" Value="#D1D5DB"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Background" Value="White"/>
+        </Style>
+
+        <!-- Label Style -->
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Foreground" Value="#374151"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+
+        <!-- Section Header Style -->
+        <Style x:Key="SectionHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#1F2937"/>
+            <Setter Property="Margin" Value="0,0,0,16"/>
+        </Style>
+
+        <!-- Base Button Style -->
+        <Style x:Key="BaseButton" TargetType="Button">
+            <Setter Property="Padding" Value="24,12"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Medium"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="8"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,0,1">
+            <Grid Margin="32,0">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="Update Car Subscription" 
+                             FontSize="24" 
+                             FontWeight="Bold" 
+                             Foreground="#1F2937"/>
+                    <TextBlock x:Name="CarInfoText" 
+                             Text="Loading..." 
+                             FontSize="13" 
+                             Foreground="#6B7280" 
+                             Margin="0,4,0,0"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="32,24">
+            <StackPanel>
+
+                <!-- Customer Information Section -->
+                <Border Background="White" 
+                        CornerRadius="12" 
+                        Padding="24" 
+                        Margin="0,0,0,20"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="👤 Customer Information" Style="{StaticResource SectionHeader}"/>
+
+                        <!-- Customer Name -->
+                        <StackPanel>
+                            <TextBlock Text="Customer Name *" Style="{StaticResource FieldLabel}"/>
+                            <TextBox x:Name="CustomerNameTextBox" 
+                                   Style="{StaticResource ModernTextBox}"/>
+                            <TextBlock x:Name="CustomerNameError" 
+                                     Text="Customer name is required" 
+                                     Foreground="#DC2626" 
+                                     FontSize="12" 
+                                     Margin="0,4,0,0" 
+                                     Visibility="Collapsed"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Car Information Section -->
+                <Border Background="White" 
+                        CornerRadius="12" 
+                        Padding="24" 
+                        Margin="0,0,0,20"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="🚗 Car Information" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Car Model -->
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Car Model *" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="CarModelTextBox" 
+                                       Style="{StaticResource ModernTextBox}"/>
+                                <TextBlock x:Name="CarModelError" 
+                                         Text="Car model is required" 
+                                         Foreground="#DC2626" 
+                                         FontSize="12" 
+                                         Margin="0,4,0,0" 
+                                         Visibility="Collapsed"/>
+                            </StackPanel>
+
+                            <!-- Car Number -->
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="Car Number *" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="CarNumberTextBox" 
+                                       Style="{StaticResource ModernTextBox}"/>
+                                <TextBlock x:Name="CarNumberError" 
+                                         Text="Car number is required" 
+                                         Foreground="#DC2626" 
+                                         FontSize="12" 
+                                         Margin="0,4,0,0" 
+                                         Visibility="Collapsed"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Subscription Details Section -->
+                <Border Background="White" 
+                        CornerRadius="12" 
+                        Padding="24" 
+                        Margin="0,0,0,20"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="💰 Subscription Details" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="16"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Subscription Amount -->
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Text="Subscription Amount *" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="SubscriptionTextBox" 
+                                       Style="{StaticResource ModernTextBox}"
+                                       TextChanged="SubscriptionTextBox_TextChanged"/>
+                                <TextBlock x:Name="SubscriptionError" 
+                                         Text="Enter a valid amount" 
+                                         Foreground="#DC2626" 
+                                         FontSize="12" 
+                                         Margin="0,4,0,0" 
+                                         Visibility="Collapsed"/>
+                            </StackPanel>
+
+                            <!-- Subscription Type -->
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <TextBlock Text="Subscription Type *" Style="{StaticResource FieldLabel}"/>
+                                <ComboBox x:Name="SubscriptionTypeComboBox" 
+                                        Style="{StaticResource ModernComboBox}"
+                                        SelectionChanged="SubscriptionTypeComboBox_SelectionChanged">
+                                    <ComboBoxItem Content="Monthly" IsSelected="True"/>
+                                    <ComboBoxItem Content="Quarterly"/>
+                                    <ComboBoxItem Content="Yearly"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- MRR Preview -->
+                            <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                                  Background="#EEF2FF" 
+                                  CornerRadius="8" 
+                                  Padding="16">
+                                <StackPanel>
+                                    <TextBlock Text="Monthly Revenue Preview" 
+                                             FontSize="13" 
+                                             FontWeight="Medium" 
+                                             Foreground="#4F46E5" 
+                                             Margin="0,0,0,4"/>
+                                    <TextBlock x:Name="MRRPreviewText" 
+                                             Text="₹0/month" 
+                                             FontSize="20" 
+                                             FontWeight="Bold" 
+                                             Foreground="#4F46E5"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Assignment and Status Section -->
+                <Border Background="White" 
+                        CornerRadius="12" 
+                        Padding="24" 
+                        Margin="0,0,0,20"
+                        BorderBrush="#E5E7EB"
+                        BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="⚙️ Assignment and Status" Style="{StaticResource SectionHeader}"/>
+
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="16"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="20"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Washer -->
+                            <StackPanel Grid.Row="0" Grid.Column="0">
+                                <TextBlock Text="Assigned Washer" Style="{StaticResource FieldLabel}"/>
+                                <TextBox x:Name="WasherTextBox" 
+                                       Style="{StaticResource ModernTextBox}"/>
+                            </StackPanel>
+
+                            <!-- Status -->
+                            <StackPanel Grid.Row="0" Grid.Column="2">
+                                <TextBlock Text="Status *" Style="{StaticResource FieldLabel}"/>
+                                <ComboBox x:Name="StatusComboBox" 
+                                        Style="{StaticResource ModernComboBox}"
+                                        SelectionChanged="StatusComboBox_SelectionChanged">
+                                    <ComboBoxItem Content="Active" IsSelected="True"/>
+                                    <ComboBoxItem Content="Inactive"/>
+                                    <ComboBoxItem Content="Pending"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Start Date -->
+                            <StackPanel Grid.Row="2" Grid.Column="0">
+                                <TextBlock Text="Start Date" Style="{StaticResource FieldLabel}"/>
+                                <DatePicker x:Name="StartDatePicker" 
+                                          FontSize="14" 
+                                          Padding="12,10"
+                                          SelectedDateChanged="StartDatePicker_SelectedDateChanged"/>
+                            </StackPanel>
+
+                            <!-- Next Due Date -->
+                            <StackPanel Grid.Row="2" Grid.Column="2">
+                                <TextBlock Text="Next Due Date *" Style="{StaticResource FieldLabel}"/>
+                                <DatePicker x:Name="NextDueDatePicker" 
+                                          FontSize="14" 
+                                          Padding="12,10"/>
+                                <TextBlock x:Name="DueDateError" 
+                                         Text="Due date is required" 
+                                         Foreground="#DC2626" 
+                                         FontSize="12" 
+                                         Margin="0,4,0,0" 
+                                         Visibility="Collapsed"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Status Warning -->
+                        <Border x:Name="StatusWarning"
+                              Background="#FEF2F2" 
+                              BorderBrush="#FCA5A5"
+                              BorderThickness="1"
+                              CornerRadius="8" 
+                              Padding="12"
+                              Margin="0,16,0,0"
+                              Visibility="Collapsed">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⚠️" FontSize="16" Margin="0,0,8,0"/>
+                                <TextBlock Text="Changing status to Inactive will stop subscription tracking" 
+                                         FontSize="13" 
+                                         Foreground="#991B1B" 
+                                         TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer Actions -->
+        <Border Grid.Row="2" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,1,0,0">
+            <Grid Margin="32,0">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <Button x:Name="CancelButton" 
+                            Content="Cancel" 
+                            Style="{StaticResource BaseButton}"
+                            Background="#F3F4F6"
+                            Foreground="#374151"
+                            Margin="0,0,12,0"
+                            Click="CancelButton_Click">
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                                      To="#E5E7EB" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+
+                    <Button x:Name="SaveButton" 
+                            Content="💾 Save Changes" 
+                            Style="{StaticResource BaseButton}"
+                            Background="#4F46E5"
+                            Foreground="White"
+                            Click="SaveButton_Click">
+                        <Button.Triggers>
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                                      To="#4338CA" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Button.Triggers>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Window>
