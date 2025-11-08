@@ -34,7 +34,7 @@
                 <DatePicker x:Name="dpEndDate" Width="120" Margin="0 0 10 0"/>
 
                 <Label Content="Type:" VerticalAlignment="Center" Margin="5 0"/>
-                <ComboBox x:Name="cmbInvoiceType" Width="140" Margin="0 0 10 0" Loaded="cmbInvoiceType_Loaded">
+                <ComboBox x:Name="cmbInvoiceType" Width="140" Margin="0 0 10 0" Loaded="cmbInvoiceType_Loaded" SelectionChanged="cmbInvoiceType_SelectionChanged">
                     <ComboBoxItem Content="-- Select Type --" IsSelected="True" IsEnabled="False"/>
                 </ComboBox>
 

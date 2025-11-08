@@ -33,13 +33,16 @@ namespace NewCustomerWindow
                 {
                     conn.Open();
 
-                    string query = @"SELECT 
-                        CustomerName, Society, Flat, Mobile,
-                        CarModel, CarNumber, 
-                        Subscription, SubscriptionType,
-                        OrderDate, NextDueDate, Washer
-                    FROM CarWashingOrders 
-                    WHERE CarInvoiceId = @carInvoiceId";
+                    string query = @"
+                SELECT 
+                    c.FullName AS CustomerName,     -- ✅ get real name
+                    cw.Society, cw.Flat, cw.Mobile,
+                    cw.CarModel, cw.CarNumber,
+                    cw.Subscription, cw.SubscriptionType,
+                    cw.OrderDate, cw.NextDueDate, cw.Washer
+                FROM CarWashingOrders cw
+                INNER JOIN Customers c ON c.Id = cw.CustomerId
+                WHERE cw.CarInvoiceId = @carInvoiceId";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
@@ -69,21 +72,14 @@ namespace NewCustomerWindow
                                 txtTotal.Text = $"₹{amount}";
 
                                 // Dates
-                                DateTime? startDate = reader["OrderDate"] != DBNull.Value
-                                    ? Convert.ToDateTime(reader["OrderDate"])
-                                    : (DateTime?)null;
-
-                                DateTime? dueDate = reader["NextDueDate"] != DBNull.Value
-                                    ? Convert.ToDateTime(reader["NextDueDate"])
-                                    : (DateTime?)null;
+                                DateTime? startDate = reader["OrderDate"] != DBNull.Value ? Convert.ToDateTime(reader["OrderDate"]) : (DateTime?)null;
+                                DateTime? dueDate = reader["NextDueDate"] != DBNull.Value ? Convert.ToDateTime(reader["NextDueDate"]) : (DateTime?)null;
 
                                 txtStartDate.Text = startDate?.ToString("dd MMM yyyy") ?? "N/A";
                                 txtDueDate.Text = dueDate?.ToString("dd MMM yyyy") ?? "N/A";
 
                                 // Washer
                                 txtWasher.Text = reader["Washer"]?.ToString() ?? "Unassigned";
-
-
                             }
                         }
                     }
@@ -96,6 +92,7 @@ namespace NewCustomerWindow
             }
         }
 
+
         private void GenerateInvoiceNumber()
         {
             try
@@ -104,20 +101,18 @@ namespace NewCustomerWindow
                 {
                     conn.Open();
 
-                    // Get the last invoice number for car washing service
-                    string query = @"SELECT TOP 1 InvoiceId 
-                                   FROM Invoices 
-                                   WHERE ServiceType = 'CarWash' 
-                                   ORDER BY InvoiceId DESC";
+                    // Count how many car wash invoices exist
+                    string query = @"SELECT COUNT(*) 
+                           FROM Invoices 
+                           WHERE ServiceType = 'CarWash'";
 
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
-                        object result = cmd.ExecuteScalar();
-                        int lastId = result != null ? Convert.ToInt32(result) : 0;
-                        int nextId = lastId + 1;
+                        int count = Convert.ToInt32(cmd.ExecuteScalar());
+                        int nextNumber = count + 1;
 
                         // Format: INV-CAR-YYYY-XXX
-                        string invoiceNumber = $"INV-CAR-{DateTime.Now.Year}-{nextId:D3}";
+                        string invoiceNumber = $"INV-CAR-{DateTime.Now.Year}-{nextNumber:D3}";
                         txtInvoiceNumber.Text = invoiceNumber;
                     }
                 }
@@ -180,7 +175,7 @@ namespace NewCustomerWindow
                         string insertInvoiceQuery = @"INSERT INTO Invoices 
                             (CustomerId, ServiceType, InvoiceDate, Amount, Status, InvoiceType, Description)
                             OUTPUT INSERTED.InvoiceId
-                            VALUES (@CustomerId, 'CarWash', @InvoiceDate, @Amount, 'Pending', 'Service', @Description)";
+                            VALUES (@CustomerId, 'CarWash', @InvoiceDate, @Amount, 'Unpaid', 'Service', @Description)";
 
                         using (SqlCommand cmd = new SqlCommand(insertInvoiceQuery, conn, transaction))
                         {

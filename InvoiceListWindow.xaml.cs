@@ -189,5 +189,12 @@ namespace NewCustomerWindow
         private void InvoiceGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
         }
+
+      
+        private void cmbInvoiceType_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            // TODO: filter or refresh your list based on selected invoice type
+        }
+
     }
 }
