@@ -229,8 +229,14 @@
       <DependentUpon>ViewInvoiceWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Class\XFontOptions.cs" />
+    <Compile Include="WaterInvoiceWindow.xaml.cs">
+      <DependentUpon>WaterInvoiceWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="WaterServiceWindow.xaml.cs">
       <DependentUpon>WaterServiceWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="WaterViewDetails.xaml.cs">
+      <DependentUpon>WaterViewDetails.xaml</DependentUpon>
     </Compile>
     <Page Include="AddSocietyCarWindow.xaml">
       <SubType>Designer</SubType>
@@ -312,7 +318,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="WaterInvoiceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="WaterServiceWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="WaterViewDetails.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

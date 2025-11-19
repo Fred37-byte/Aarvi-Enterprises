@@ -1,0 +1,89 @@
+﻿using System;
+using System.Data;
+using System.Data.SqlClient;
+using System.IO;
+using ClosedXML.Excel;
+using System.Collections.Generic;
+
+namespace NewCustomerWindow
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            string connectionString = "Server=DESKTOP-71OLI2R;Database=BusinessManager;Trusted_Connection=True;";
+            string exportPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SqlExport.xlsx");
+            
+            try
+            {
+                using (XLWorkbook workbook = new XLWorkbook())
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    Console.WriteLine("✅ Database connection established!");
+                    
+                    DataTable schema = conn.GetSchema("Tables");
+                    List<string> userTables = new List<string>();
+                    
+                    foreach (DataRow row in schema.Rows)
+                    {
+                        if (row["TABLE_TYPE"].ToString() == "BASE TABLE")
+                            userTables.Add(row["TABLE_NAME"].ToString());
+                    }
+                    
+                    Console.WriteLine($"Found {userTables.Count} tables to export...\n");
+                    
+                    foreach (string tableName in userTables)
+                    {
+                        try
+                        {
+                            Console.Write($"Exporting {tableName}... ");
+                            
+                            DataTable dt = new DataTable();
+                            using (SqlCommand cmd = new SqlCommand($"SELECT * FROM [{tableName}]", conn))
+                            using (SqlDataAdapter adapter = new SqlDataAdapter(cmd))
+                            {
+                                adapter.Fill(dt);
+                            }
+                            
+                            string[] columnsToSkip = { "RowVersion", "IsDeleted", "PasswordHash" };
+                            foreach (string colName in columnsToSkip)
+                            {
+                                if (dt.Columns.Contains(colName))
+                                    dt.Columns.Remove(colName);
+                            }
+                            
+                            if (dt.Rows.Count > 0)
+                            {
+                                var ws = workbook.Worksheets.Add(dt, tableName);
+                                ws.Row(1).Style.Font.Bold = true;
+                                ws.Columns().AdjustToContents();
+                                Console.WriteLine($"✅ ({dt.Rows.Count} rows)");
+                            }
+                            else
+                            {
+                                Console.WriteLine("⚠️ (empty table, skipped)");
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine($"❌ Error: {ex.Message}");
+                        }
+                    }
+                    
+                    workbook.SaveAs(exportPath);
+                    Console.WriteLine($"\n✅ All tables exported successfully!");
+                    Console.WriteLine($"📁 File saved to: {exportPath}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ Critical Error: {ex.Message}");
+                Console.WriteLine($"Stack Trace: {ex.StackTrace}");
+            }
+            
+            Console.WriteLine("\nPress any key to exit...");
+            Console.ReadKey();
+        }
+    }
+}

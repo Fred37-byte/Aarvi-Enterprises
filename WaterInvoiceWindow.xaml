@@ -1,0 +1,310 @@
+﻿<Window x:Class="NewCustomerWindow.xaml.WaterInvoiceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="📄 Water Invoice" Height="700" Width="900"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5">
+
+    <Window.Resources>
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Label Style -->
+        <Style x:Key="InfoLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#7F8C8D"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <!-- Value Style -->
+        <Style x:Key="InfoValue" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="FontWeight" Value="Regular"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+
+        <!-- DataGrid Style -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F9F9F9"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#F0F0F0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="RowHeight" Value="35"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+        </Style>
+
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#34495E"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Padding="{TemplateBinding Padding}" 
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Border Background="White" Margin="20" CornerRadius="10" 
+                BorderBrush="#E0E0E0" BorderThickness="1">
+            <Grid Margin="30">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Invoice Header -->
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Company Info -->
+                    <StackPanel Grid.Column="0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="💧" FontSize="32" Foreground="#3498DB" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <StackPanel>
+                                <TextBlock Text="Water Delivery Service" 
+                                         FontSize="22" 
+                                         FontWeight="Bold"
+                                         Foreground="#2C3E50"/>
+                                <TextBlock Text="Premium Water Solutions" 
+                                         FontSize="12" 
+                                         Foreground="#7F8C8D"
+                                         Margin="0,2,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Invoice Number -->
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="INVOICE" 
+                                 FontSize="24" 
+                                 FontWeight="Bold"
+                                 Foreground="#E74C3C"
+                                 HorizontalAlignment="Right"/>
+                        <TextBlock Name="InvoiceNumberText" 
+                                 Text="#0000" 
+                                 FontSize="18" 
+                                 FontWeight="SemiBold"
+                                 Foreground="#2C3E50"
+                                 HorizontalAlignment="Right"
+                                 Margin="0,2,0,0"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Divider -->
+                <Border Grid.Row="1" Height="2" Background="#E0E0E0" Margin="0,0,0,20"/>
+
+                <!-- Customer & Invoice Info -->
+                <Grid Grid.Row="2" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Bill To -->
+                    <Border Grid.Column="0" Background="#F8F9FA" Padding="15" CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Text="📋 BILL TO" 
+                                     FontSize="12" 
+                                     FontWeight="Bold"
+                                     Foreground="#7F8C8D"
+                                     Margin="0,0,0,10"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Customer: " Style="{StaticResource InfoLabel}" Width="80"/>
+                                <TextBlock Name="CustomerNameText" Text="-" Style="{StaticResource InfoValue}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Phone: " Style="{StaticResource InfoLabel}" Width="80"/>
+                                <TextBlock Name="PhoneText" Text="-" Style="{StaticResource InfoValue}"/>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,5,0,0">
+                                <TextBlock Text="Address: " Style="{StaticResource InfoLabel}" Margin="0,0,0,3"/>
+                                <TextBlock Name="AddressText" Text="-" Style="{StaticResource InfoValue}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Invoice Details -->
+                    <Border Grid.Column="2" Background="#F8F9FA" Padding="15" CornerRadius="8">
+                        <StackPanel>
+                            <TextBlock Text="📅 INVOICE DETAILS" 
+                                     FontSize="12" 
+                                     FontWeight="Bold"
+                                     Foreground="#7F8C8D"
+                                     Margin="0,0,0,10"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Invoice Date: " Style="{StaticResource InfoLabel}" Width="100"/>
+                                <TextBlock Name="InvoiceDateText" Text="-" Style="{StaticResource InfoValue}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Delivery Date: " Style="{StaticResource InfoLabel}" Width="100"/>
+                                <TextBlock Name="DeliveryDateText" Text="-" Style="{StaticResource InfoValue}"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="Payment Status: " Style="{StaticResource InfoLabel}" Width="100"/>
+                                <TextBlock Name="PaymentStatusText" Text="-" Style="{StaticResource InfoValue}" Foreground="#27AE60" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Water Orders Table -->
+                <Border Grid.Row="3" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1" Margin="0,0,0,20">
+                    <DataGrid Name="WaterOrdersDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              SelectionMode="Single"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Sr." Binding="{Binding SerialNo}" Width="50"/>
+                            <DataGridTextColumn Header="Brand" Binding="{Binding Brand}" Width="*"/>
+                            <DataGridTextColumn Header="Bottle Size" Binding="{Binding Quantity}" Width="120"/>
+                            <DataGridTextColumn Header="Units" Binding="{Binding Units}" Width="80"/>
+                            <DataGridTextColumn Header="Price/Unit" Binding="{Binding PricePerUnit, StringFormat='₹{0:N2}'}" Width="100"/>
+                            <DataGridTextColumn Header="Total" Binding="{Binding TotalPrice, StringFormat='₹{0:N2}'}" Width="120"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+
+                <!-- Summary Section -->
+                <Border Grid.Row="4" Background="#ECF0F1" Padding="20" CornerRadius="8" Margin="0,0,0,15">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="250"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Notes -->
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                            <TextBlock Text="💬 Notes" 
+                                     FontSize="12" 
+                                     FontWeight="Bold"
+                                     Foreground="#7F8C8D"
+                                     Margin="0,0,0,5"/>
+                            <TextBlock Text="Thank you for choosing our water delivery service!" 
+                                     FontSize="12" 
+                                     Foreground="#95A5A6"
+                                     TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <!-- Total Summary -->
+                        <StackPanel Grid.Column="1">
+                            <Border Background="White" Padding="15" CornerRadius="6">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,8">
+                                        <TextBlock Text="Subtotal:" Style="{StaticResource InfoLabel}" HorizontalAlignment="Left"/>
+                                        <TextBlock Name="SubtotalText" Text="₹0.00" Style="{StaticResource InfoValue}" HorizontalAlignment="Right"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,8">
+                                        <TextBlock Text="Tax (0%):" Style="{StaticResource InfoLabel}" HorizontalAlignment="Left"/>
+                                        <TextBlock Name="TaxText" Text="₹0.00" Style="{StaticResource InfoValue}" HorizontalAlignment="Right"/>
+                                    </Grid>
+
+                                    <Border Height="1" Background="#E0E0E0" Margin="0,5"/>
+
+                                    <Grid Margin="0,8,0,0">
+                                        <TextBlock Text="TOTAL:" FontSize="14" FontWeight="Bold" Foreground="#2C3E50" HorizontalAlignment="Left"/>
+                                        <TextBlock Name="TotalAmountText" Text="₹0.00" FontSize="16" FontWeight="Bold" Foreground="#27AE60" HorizontalAlignment="Right"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Action Buttons -->
+                <Grid Grid.Row="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="10"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" 
+                            Content="🖨️ Print Invoice" 
+                            Style="{StaticResource ModernButton}"
+                            Background="#3498DB"
+                            Click="PrintButton_Click"/>
+
+                    <Button Grid.Column="2" 
+                            Content="💾 Save as PDF" 
+                            Style="{StaticResource ModernButton}"
+                            Background="#27AE60"
+                            Click="SavePdfButton_Click"/>
+
+                    <Button Grid.Column="4" 
+                            Content="✖️ Close" 
+                            Style="{StaticResource ModernButton}"
+                            Background="#95A5A6"
+                            Click="CloseButton_Click"/>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,65 +1,46 @@
-﻿using System;
+﻿// EmployeeManagerWPF.Models (Invoice.cs) -- small additions only
+using System;
 using System.Collections.Generic;
-using NewCustomerWindow.xaml.Class; // ✅ Needed so Invoice can see WaterServices
 
 namespace EmployeeManagerWPF.Models
 {
-    // Main Invoice class
     public class Invoice
     {
-        // Primary Key
         public int InvoiceId { get; set; }
-
-        // Foreign Key - linked to Customer
         public int CustomerId { get; set; }
-
-        // Customer Name (for display only, not DB relation ideally)
         public string CustomerName { get; set; }
 
-        // Customer details for invoice display
         public string CustomerAddress { get; set; }
         public string CustomerCity { get; set; }
         public string CustomerZipCode { get; set; }
         public string CustomerPhone { get; set; }
         public string CustomerEmail { get; set; }
 
-        // Invoice type (e.g., Service, Product, Subscription)
         public string InvoiceType { get; set; }
-
-        // Extra description/details about the invoice
         public string Description { get; set; }
-
-        // Invoice Amount (this is the final total)
         public decimal Amount { get; set; }
-
-        // Invoice Status (Paid, Pending, Cancelled, etc.)
         public string Status { get; set; }
-
-        // Date when invoice was issued
         public DateTime InvoiceDate { get; set; }
-
-        // Service Type (for categorization)
         public string ServiceType { get; set; }
 
-        // 💰 Financial fields for itemized invoices
         public decimal Subtotal { get; set; }
         public decimal DiscountPercentage { get; set; }
         public decimal DiscountAmount { get; set; }
 
-        // TotalAmount is the same as Amount (for compatibility)
         public decimal TotalAmount
         {
             get => Amount;
             set => Amount = value;
         }
 
-        // Display properties
         public string DiscountText => $"DISCOUNT ({DiscountPercentage}%)";
 
-        // 📋 Invoice items collection (for multi-item invoices)
         public List<InvoiceItem> InvoiceItems { get; set; }
 
-        // 🔗 Navigation property for Water Supply details
+        // NEW: Car Service details (for Car Washing / Car Service invoices)
+        public CarServiceDetails CarDetails { get; set; }
+
+        // Also kept WaterDetails for water-supply invoices
         public WaterServices WaterDetails { get; set; }
 
         public Invoice()
@@ -68,10 +49,10 @@ namespace EmployeeManagerWPF.Models
             InvoiceDate = DateTime.Now;
             Status = "Unpaid";
             DiscountPercentage = 0;
+            CarDetails = null; // will be populated later if applicable
         }
     }
 
-    // Invoice Item class for line items
     public class InvoiceItem
     {
         public int ItemId { get; set; }
@@ -83,7 +64,17 @@ namespace EmployeeManagerWPF.Models
         public decimal Amount => Rate * Quantity;
     }
 
-    // Water service details
+    // NEW class: Car-specific details
+    public class CarServiceDetails
+    {
+        // Example fields — adjust to match your DB
+        public string VehicleModel { get; set; }         // e.g., "Innova Crysta (MH04J4548)"
+        public string RegistrationNumber { get; set; }   // e.g., "MH04J4548"
+        public string Package { get; set; }              // e.g., "SUV (Yearly)"
+        public DateTime? LastServiceDate { get; set; }
+        public string Notes { get; set; }
+    }
+
     public class WaterServices
     {
         public int OrderID { get; set; }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
+using System.Windows.Media;
 using EmployeeManagerWPF.Models;
 using Microsoft.Win32;
 using PdfSharp.Drawing;
@@ -19,6 +20,55 @@ namespace NewCustomerWindow.xaml
             _invoice = invoice ?? throw new ArgumentNullException(nameof(invoice));
 
             DataContext = _invoice;
+
+            // Set status-based styling
+            UpdateStatusDisplay();
+        }
+
+        private void UpdateStatusDisplay()
+        {
+            string status = _invoice.Status ?? "Unpaid";
+
+            // Update status badge
+            switch (status.ToLower())
+            {
+                case "paid":
+                    StatusBadge.Background = new SolidColorBrush(Color.FromRgb(16, 185, 129)); // Green
+                    StatusText.Text = "✓ PAID";
+                    StatusText.Foreground = Brushes.White;
+
+                    // Update balance section
+                    BalanceLabel.Text = "AMOUNT PAID";
+                    BalanceDueBorder.Background = new SolidColorBrush(Color.FromRgb(236, 253, 245)); // Light green
+                    BalanceDueLabel.Text = "AMOUNT PAID";
+                    BalanceDueLabel.Foreground = new SolidColorBrush(Color.FromRgb(16, 185, 129));
+                    break;
+
+                case "pending":
+                    StatusBadge.Background = new SolidColorBrush(Color.FromRgb(245, 158, 11)); // Orange
+                    StatusText.Text = "⏳ PENDING";
+                    StatusText.Foreground = Brushes.White;
+
+                    // Update balance section
+                    BalanceLabel.Text = "BALANCE DUE";
+                    BalanceDueBorder.Background = new SolidColorBrush(Color.FromRgb(254, 243, 199)); // Light orange
+                    BalanceDueLabel.Text = "BALANCE DUE";
+                    BalanceDueLabel.Foreground = new SolidColorBrush(Color.FromRgb(245, 158, 11));
+                    break;
+
+                case "unpaid":
+                default:
+                    StatusBadge.Background = new SolidColorBrush(Color.FromRgb(239, 68, 68)); // Red
+                    StatusText.Text = "⚠ DUE";
+                    StatusText.Foreground = Brushes.White;
+
+                    // Update balance section
+                    BalanceLabel.Text = "BALANCE DUE";
+                    BalanceDueBorder.Background = new SolidColorBrush(Color.FromRgb(248, 249, 250)); // Light gray
+                    BalanceDueLabel.Text = "BALANCE DUE";
+                    BalanceDueLabel.Foreground = Brushes.Black;
+                    break;
+            }
         }
 
         private void Close_Click(object sender, RoutedEventArgs e)
@@ -71,6 +121,11 @@ namespace NewCustomerWindow.xaml
             var lightBg = XColor.FromArgb(248, 249, 250);
             var borderColor = XColor.FromArgb(222, 226, 230);
 
+            // Status colors
+            var greenColor = XColor.FromArgb(16, 185, 129);
+            var redColor = XColor.FromArgb(239, 68, 68);
+            var orangeColor = XColor.FromArgb(245, 158, 11);
+
             // Fonts
             var companyFont = new XFont("Arial", 20, XFontStyleEx.Bold);
             var invoiceTitleFont = new XFont("Arial", 32, XFontStyleEx.Bold);
@@ -113,19 +168,46 @@ namespace NewCustomerWindow.xaml
             gfx.DrawString("aarvienterprise@gmail.com", smallFont, new XSolidBrush(grayText), leftMargin, y);
             y += 25;
 
-            // DATE, DUE, BALANCE DUE Section
+            // DATE, STATUS, BALANCE DUE Section
             double col1X = leftMargin;
             double col2X = leftMargin + (contentWidth / 3);
             double col3X = leftMargin + (contentWidth * 2 / 3);
 
             gfx.DrawString("DATE", labelFont, new XSolidBrush(XColors.Black), col1X, y);
-            gfx.DrawString("DUE", labelFont, new XSolidBrush(XColors.Black), col2X, y);
-            gfx.DrawString("BALANCE DUE", labelFont, new XSolidBrush(XColors.Black),
+            gfx.DrawString("STATUS", labelFont, new XSolidBrush(XColors.Black), col2X, y);
+
+            string status = _invoice.Status ?? "Unpaid";
+            string balanceLabel = status.Equals("Paid", StringComparison.OrdinalIgnoreCase) ? "AMOUNT PAID" : "BALANCE DUE";
+            gfx.DrawString(balanceLabel, labelFont, new XSolidBrush(XColors.Black),
                 new XRect(col3X, y, rightMargin - col3X, 15), XStringFormats.TopRight);
             y += 13;
 
             gfx.DrawString(_invoice.InvoiceDate.ToString("MMM d, yyyy"), textFont, new XSolidBrush(darkText), col1X, y);
-            gfx.DrawString("On Receipt", textFont, new XSolidBrush(darkText), col2X, y);
+
+            // Draw status with color
+            XColor statusColor;
+            string statusText;
+            switch (status.ToLower())
+            {
+                case "paid":
+                    statusColor = greenColor;
+                    statusText = "✓ PAID";
+                    break;
+                case "pending":
+                    statusColor = orangeColor;
+                    statusText = "⏳ PENDING";
+                    break;
+                default:
+                    statusColor = redColor;
+                    statusText = "⚠ DUE";
+                    break;
+            }
+
+            // Draw status badge
+            DrawRoundedBox(gfx, col2X, y - 2, 60, 14, statusColor);
+            gfx.DrawString(statusText, new XFont("Arial", 8, XFontStyleEx.Bold),
+                new XSolidBrush(XColors.White), col2X + 5, y + 8);
+
             gfx.DrawString($"INR ₹{_invoice.Amount:N2}", textFont, new XSolidBrush(darkText),
                 new XRect(col3X, y, rightMargin - col3X, 20), XStringFormats.TopRight);
             y += 30;
@@ -245,9 +327,14 @@ namespace NewCustomerWindow.xaml
                 new XRect(totalsX + 105, y, 95, 15), XStringFormats.TopRight);
             y += 30;
 
-            // BALANCE DUE Box
-            DrawBox(gfx, rightMargin - 280, y, 280, 35, lightBg);
-            gfx.DrawString("BALANCE DUE", headerFont, new XSolidBrush(XColors.Black),
+            // BALANCE DUE / PAID Box
+            XColor boxColor = status.Equals("Paid", StringComparison.OrdinalIgnoreCase)
+                ? XColor.FromArgb(236, 253, 245)  // Light green for paid
+                : lightBg;  // Light gray for unpaid/pending
+
+            DrawBox(gfx, rightMargin - 280, y, 280, 35, boxColor);
+            gfx.DrawString(balanceLabel, headerFont,
+                new XSolidBrush(status.Equals("Paid", StringComparison.OrdinalIgnoreCase) ? greenColor : XColors.Black),
                 rightMargin - 265, y + 10);
             gfx.DrawString($"INR ₹{_invoice.Amount:N2}",
                 new XFont("Arial", 12, XFontStyleEx.Bold), new XSolidBrush(darkText),
@@ -257,6 +344,11 @@ namespace NewCustomerWindow.xaml
         }
 
         private void DrawBox(XGraphics gfx, double x, double y, double width, double height, XColor color)
+        {
+            gfx.DrawRectangle(new XSolidBrush(color), x, y, width, height);
+        }
+
+        private void DrawRoundedBox(XGraphics gfx, double x, double y, double width, double height, XColor color)
         {
             gfx.DrawRectangle(new XSolidBrush(color), x, y, width, height);
         }

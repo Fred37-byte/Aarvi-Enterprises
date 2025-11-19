@@ -5,98 +5,262 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NewCustomerWindow.xaml"
         mc:Ignorable="d"
-        Title="WaterServiceWindow" Height="450" Width="1100">
+        Title="💧 Water Service Orders" Height="650" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        Background="#F5F5F5">
 
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
+    <Window.Resources>
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="20,0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" 
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Opacity" Value="0.9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
-        <!-- Title Row with Search -->
-        <DockPanel Margin="0,0,0,10">
-            <TextBlock Text="💧 Water Service Orders" 
-                       FontSize="22" FontWeight="Bold"
-                       Foreground="#0078D7"
-                       DockPanel.Dock="Left"/>
+        <!-- TextBox Style -->
+        <Style x:Key="ModernTextBox" TargetType="TextBox">
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="BorderBrush" Value="#D0D0D0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
 
-            <!-- Search Bar -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
-                <Label Content="Search:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                <TextBox Name="SearchTextBox" Width="200" Height="28" 
-                         Margin="0,0,5,0" 
-                         VerticalContentAlignment="Center"
-                         TextChanged="SearchTextBox_TextChanged"/>
-                <Button Content="Search" Width="70" Height="28" 
-                        Background="#0078D7" Foreground="White"
-                        Click="SearchButton_Click"/>
-            </StackPanel>
-        </DockPanel>
+        <!-- DataGrid Style -->
+        <Style TargetType="DataGrid">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="RowBackground" Value="White"/>
+            <Setter Property="AlternatingRowBackground" Value="#F9F9F9"/>
+            <Setter Property="GridLinesVisibility" Value="Horizontal"/>
+            <Setter Property="HorizontalGridLinesBrush" Value="#F0F0F0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="RowHeight" Value="40"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+        </Style>
 
-        <!-- Form & List -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320"/>
-                <ColumnDefinition Width="20"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+        <Style TargetType="DataGridColumnHeader">
+            <Setter Property="Background" Value="#F8F9FA"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderBrush" Value="#E0E0E0"/>
+            <Setter Property="BorderThickness" Value="0,0,0,2"/>
+        </Style>
 
-            <!-- Left Form -->
-            <Border Grid.Column="0" Background="White" Padding="15" CornerRadius="10" 
-                    VerticalAlignment="Top" BorderBrush="#DDD" BorderThickness="1">
-                <StackPanel>
+        <Style TargetType="DataGridCell">
+            <Setter Property="Padding" Value="12,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="DataGridCell">
+                        <Border Padding="{TemplateBinding Padding}" 
+                                Background="{TemplateBinding Background}">
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
-                 
-                    <!-- Brand -->
-                    <TextBlock Text="Brand:" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <ComboBox Name="BrandCombo" Height="30" Margin="0,0,0,10">
-                        <ComboBoxItem Content="Bisleri"/>
-                        <ComboBoxItem Content="Aquafina"/>
-                        <ComboBoxItem Content="Kinley"/>
-                    </ComboBox>
+    <Grid>
+        <!-- Main Content Area -->
+        <Border Background="White" Margin="20" CornerRadius="12" 
+                BorderBrush="#E0E0E0" BorderThickness="1">
+            <Grid Margin="25">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                    <!-- Quantity -->
-                    <TextBlock Text="Quantity:" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <ComboBox Name="QuantityCombo" Height="30" Margin="0,0,0,10">
-                        <ComboBoxItem Content="5 Liters"/>
-                        <ComboBoxItem Content="10 Liters"/>
-                        <ComboBoxItem Content="20 Liters"/>
-                    </ComboBox>
+                <!-- Header Section -->
+                <Grid Grid.Row="0" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-                    <!-- Number of Units -->
-                    <TextBlock Text="Number of Units:" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <TextBox Name="UnitsTextBox" Height="30" Margin="0,0,0,10" />
-
-                    <!-- Address -->
-                    <TextBlock Text="Address:" FontWeight="Bold" Margin="0,0,0,5"/>
-                    <TextBox Name="AddressTextBox" Height="60" AcceptsReturn="True"
-                             TextWrapping="Wrap" Margin="0,0,0,10"/>
-
-                    <!-- Buttons -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="Add" Width="70" Margin="0,0,10,0" Background="#28A745" Foreground="White" Click="Add_Click"/>
-                        <Button Content="Update" Width="70" Margin="0,0,10,0" Background="#FFC107" Foreground="White" Click="Update_Click"/>
-                        <Button Content="Delete" Width="70" Background="#DC3545" Foreground="White" Click="Delete_Click"/>
+                    <!-- Title -->
+                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                        <TextBlock Text="💧" FontSize="32"  VerticalAlignment="Center"  Foreground="#1565C0" Margin="0,0,10,0" RenderTransformOrigin="0.439,0.078"/>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock Text="Water Service Orders" 
+                                     FontSize="24" FontWeight="Bold"
+                                     Foreground="#2C3E50"/>
+                            <TextBlock Text="View and manage water delivery orders" 
+                                     FontSize="13" 
+                                     Foreground="#7F8C8D"
+                                     Margin="0,2,0,0"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
-            </Border>
 
-            <!-- Right DataGrid -->
-            <DataGrid Name="OrdersDataGrid" Grid.Column="2"
-                      AutoGenerateColumns="False"
-                      Background="White" BorderBrush="#DDD" BorderThickness="1"
-                      CanUserAddRows="False" Margin="0,0,0,0"
-                      SelectionMode="Single" SelectionUnit="FullRow">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Invoice Id" Binding="{Binding InvoiceId}" Width="80"/>
-                    <DataGridTextColumn Header=" Customer" Binding="{Binding Customer}" Width="150"/>
-                    
-                    <DataGridTextColumn Header=" Brand" Binding="{Binding Brand}" Width="150"/>
-                    <DataGridTextColumn Header=" Quantity" Binding="{Binding Quantity}" Width="150"/>
-                    <DataGridTextColumn Header=" Units" Binding="{Binding Units}" Width="100"/>
-                    <DataGridTextColumn Header=" Address" Binding="{Binding Address}" Width="*"/>
-                </DataGrid.Columns>
-            </DataGrid>
-        </Grid>
+                    <!-- Search Box -->
+                    <Grid Grid.Column="1" VerticalAlignment="Center">
+                        <TextBox Name="SearchTextBox" 
+                                Width="280" 
+                                Style="{StaticResource ModernTextBox}"
+                                TextChanged="SearchTextBox_TextChanged">
+                            <TextBox.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
+                        <TextBlock Text="🔍 Search by customer, brand, or invoice..." 
+                                 Foreground="#95A5A6"
+                                 FontSize="12"
+                                 IsHitTestVisible="False"
+                                 Padding="15,10"
+                                 VerticalAlignment="Center"
+                                 HorizontalAlignment="Left">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchTextBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                </Grid>
+
+                <!-- Stats Cards -->
+                <Grid Grid.Row="1" Margin="0,0,0,20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="15"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="15"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="15"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Total Orders Card -->
+                    <Border Grid.Column="0" Background="#E8F5E9" CornerRadius="8" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="📦 Total Orders" FontSize="12" Foreground="#2E7D32" FontWeight="SemiBold"/>
+                            <TextBlock Name="TotalOrdersText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#1B5E20" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Total Bottles Card -->
+                    <Border Grid.Column="2" Background="#E3F2FD" CornerRadius="8" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="💧 Total Bottles" FontSize="12" Foreground="#1565C0" FontWeight="SemiBold"/>
+                            <TextBlock Name="TotalBottlesText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#0D47A1" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Unique Customers Card -->
+                    <Border Grid.Column="4" Background="#FFF3E0" CornerRadius="8" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="👥 Customers" FontSize="12" Foreground="#E65100" FontWeight="SemiBold"/>
+                            <TextBlock Name="TotalCustomersText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#BF360C" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Recent Orders Card -->
+                    <Border Grid.Column="6" Background="#F3E5F5" CornerRadius="8" Padding="15">
+                        <StackPanel>
+                            <TextBlock Text="📅 This Month" FontSize="12" Foreground="#6A1B9A" FontWeight="SemiBold"/>
+                            <TextBlock Name="ThisMonthText" Text="0" FontSize="24" FontWeight="Bold" Foreground="#4A148C" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Data Grid -->
+                <Border Grid.Row="2" CornerRadius="8" BorderBrush="#E0E0E0" BorderThickness="1">
+                    <DataGrid Name="OrdersDataGrid"
+                              AutoGenerateColumns="False"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              SelectionMode="Single" 
+                              SelectionUnit="FullRow"
+                              IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Invoice ID" Binding="{Binding InvoiceId}" Width="100"/>
+                            <DataGridTextColumn Header="Customer Name" Binding="{Binding CustomerName}" Width="200"/>
+                            <DataGridTextColumn Header="Brand" Binding="{Binding Brand}" Width="150"/>
+                            <DataGridTextColumn Header="Bottle Size" Binding="{Binding Quantity}" Width="120"/>
+                            <DataGridTextColumn Header="Units" Binding="{Binding Units}" Width="100"/>
+                            <DataGridTextColumn Header="Delivery Date" Binding="{Binding DeliveryDate, StringFormat='dd MMM yyyy'}" Width="130"/>
+                            <DataGridTextColumn Header="Delivery Address" Binding="{Binding Address}" Width="*"/>
+
+                            <!-- Action Column -->
+                            <DataGridTemplateColumn Header="Actions" Width="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="View Details" 
+                                                Height="28"
+                                                Padding="10,0"
+                                                FontSize="11"
+                                                Background="#3498DB"
+                                                Foreground="White"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Click="ViewDetailsButton_Click"
+                                                Tag="{Binding}">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border Background="{TemplateBinding Background}" 
+                                                                        CornerRadius="4" 
+                                                                        Padding="{TemplateBinding Padding}">
+                                                                    <ContentPresenter HorizontalAlignment="Center" 
+                                                                                    VerticalAlignment="Center"/>
+                                                                </Border>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver" Value="True">
+                                                            <Setter Property="Background" Value="#2980B9"/>
+                                                        </Trigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Border>
+            </Grid>
+        </Border>
     </Grid>
 </Window>

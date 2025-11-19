@@ -216,10 +216,17 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Step 5: Line Items -->
+                <!-- Step 5: Service-Specific Details (Water/Car) -->
+                <Border x:Name="ServiceSpecificSection" Style="{StaticResource Card}" Visibility="Collapsed">
+                    <StackPanel x:Name="ServiceSpecificPanel">
+                        <!-- Dynamic content based on service type -->
+                    </StackPanel>
+                </Border>
+
+                <!-- Step 6: Line Items -->
                 <Border x:Name="ItemsSection" Style="{StaticResource Card}" Visibility="Collapsed">
                     <StackPanel>
-                        <TextBlock x:Name="ItemsSectionTitle" Text="4. Add Items" Style="{StaticResource SectionHeader}"/>
+                        <TextBlock x:Name="ItemsSectionTitle" Text="5. Invoice Items" Style="{StaticResource SectionHeader}"/>
 
                         <DataGrid x:Name="ItemsGrid"
                                   AutoGenerateColumns="False"
@@ -228,7 +235,8 @@
                                   Height="200"
                                   Margin="0,0,0,12"
                                   BorderBrush="#d1d5db"
-                                  BorderThickness="1">
+                                  BorderThickness="1"
+                                  SelectionChanged="ItemsGrid_SelectionChanged">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Item Name" Binding="{Binding ItemName}" Width="2*"/>
                                 <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="2*"/>
@@ -239,21 +247,10 @@
                         </DataGrid>
 
                         <StackPanel Orientation="Horizontal">
-                            <Button Content="+ Add Item" 
-                                    Style="{StaticResource SecondaryButton}"
-                                    Click="AddItem_Click"
-                                    Margin="0,0,8,0"/>
                             <Button Content="Remove Selected" 
                                     Style="{StaticResource SecondaryButton}"
                                     Click="RemoveItem_Click"/>
                         </StackPanel>
-                    </StackPanel>
-                </Border>
-
-                <!-- Step 6: Service-Specific Details (Water/Car) -->
-                <Border x:Name="ServiceSpecificSection" Style="{StaticResource Card}" Visibility="Collapsed">
-                    <StackPanel x:Name="ServiceSpecificPanel">
-                        <!-- Dynamic content based on service type -->
                     </StackPanel>
                 </Border>
 

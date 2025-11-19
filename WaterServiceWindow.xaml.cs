@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -8,15 +10,17 @@ namespace NewCustomerWindow.xaml
 {
     public partial class WaterServiceWindow : Window
     {
-        private string connectionString = @"Data Source=DESKTOP-71OLI2R;Initial Catalog=BusinessManager;Integrated Security=True";
+        private string connectionString;
+        private List<WaterOrder> allOrders = new List<WaterOrder>();
 
         public WaterServiceWindow()
         {
             InitializeComponent();
+            connectionString = ConfigurationManager.ConnectionStrings["EmployeeDB"].ConnectionString;
             LoadOrders();
         }
 
-        // 🔹 Load orders with Invoice + Customer info
+        // 🔹 Load orders with Invoice + Customer info + DeliveryDate
         private void LoadOrders()
         {
             try
@@ -25,106 +29,124 @@ namespace NewCustomerWindow.xaml
                 {
                     string query = @"
                         SELECT 
+                            w.WaterInvoiceId,
                             w.InvoiceId,
-                            i.CustomerName AS Customer,
+                            ISNULL(i.CustomerName, 'Unknown') AS CustomerName,
                             w.Brand,
                             w.Quantity,
                             w.Units,
+                            w.DeliveryDate,
                             w.Address
                         FROM WaterOrders w
-                        INNER JOIN Invoices i ON w.InvoiceId = i.InvoiceId";
+                        LEFT JOIN Invoices i ON w.InvoiceId = i.InvoiceId
+                        ORDER BY w.DeliveryDate DESC, w.WaterInvoiceId DESC";
 
                     SqlCommand cmd = new SqlCommand(query, conn);
                     conn.Open();
 
                     SqlDataReader reader = cmd.ExecuteReader();
-                    var orders = new System.Collections.Generic.List<dynamic>();
+                    allOrders.Clear();
 
                     while (reader.Read())
                     {
-                        orders.Add(new
+                        allOrders.Add(new WaterOrder
                         {
-                            InvoiceId = reader["InvoiceId"].ToString(),
-                            Customer = reader["Customer"].ToString(), // ✅ FIXED: use alias "Customer"
+                            WaterInvoiceId = Convert.ToInt32(reader["WaterInvoiceId"]),
+                            InvoiceId = Convert.ToInt32(reader["InvoiceId"]),
+                            CustomerName = reader["CustomerName"].ToString(),
                             Brand = reader["Brand"].ToString(),
                             Quantity = reader["Quantity"].ToString(),
-                            Units = reader["Units"].ToString(),
+                            Units = Convert.ToInt32(reader["Units"]),
+                            DeliveryDate = Convert.ToDateTime(reader["DeliveryDate"]),
                             Address = reader["Address"].ToString()
                         });
                     }
 
-                    OrdersDataGrid.ItemsSource = orders;
+                    OrdersDataGrid.ItemsSource = allOrders;
+                    UpdateStatistics();
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error loading orders: " + ex.Message);
+                MessageBox.Show($"Error loading orders: {ex.Message}", "Database Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        // 🔹 Search Orders
-        private void SearchButton_Click(object sender, RoutedEventArgs e)
-        {
-            FilterOrders(SearchTextBox.Text.Trim());
-        }
-
-        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            FilterOrders(SearchTextBox.Text.Trim());
-        }
-
-        private void FilterOrders(string searchText)
+        // 🔹 Update statistics cards
+        private void UpdateStatistics()
         {
             try
             {
-                using (SqlConnection conn = new SqlConnection(connectionString))
-                {
-                    string query = @"
-                        SELECT 
-                            w.InvoiceId,
-                            i.CustomerName AS Customer,
-                            w.Brand,
-                            w.Quantity,
-                            w.Units,
-                            w.Address
-                        FROM WaterOrders w
-                        INNER JOIN Invoices i ON w.InvoiceId = i.InvoiceId
-                        WHERE i.CustomerName LIKE @search
-                           OR w.Brand LIKE @search
-                           OR w.Quantity LIKE @search
-                           OR w.Address LIKE @search
-                           OR CAST(w.Units AS NVARCHAR) LIKE @search
-                           OR CAST(w.InvoiceId AS NVARCHAR) LIKE @search";
+                // Total Orders
+                TotalOrdersText.Text = allOrders.Count.ToString();
 
-                    SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
-                    adapter.SelectCommand.Parameters.AddWithValue("@search", "%" + searchText + "%");
+                // Total Bottles
+                int totalBottles = allOrders.Sum(o => o.Units);
+                TotalBottlesText.Text = totalBottles.ToString();
 
-                    DataTable dt = new DataTable();
-                    adapter.Fill(dt);
+                // Unique Customers
+                int uniqueCustomers = allOrders.Select(o => o.CustomerName).Distinct().Count();
+                TotalCustomersText.Text = uniqueCustomers.ToString();
 
-                    OrdersDataGrid.ItemsSource = dt.DefaultView;
-                }
+                // This Month Orders
+                DateTime startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+                int thisMonthOrders = allOrders.Count(o => o.DeliveryDate >= startOfMonth);
+                ThisMonthText.Text = thisMonthOrders.ToString();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error searching orders: " + ex.Message);
+                // Silent fail for statistics
+                Console.WriteLine($"Statistics update error: {ex.Message}");
             }
         }
 
-        // 🔹 Ignore Add/Update/Delete for now
-        private void Add_Click(object sender, RoutedEventArgs e)
+        // 🔹 Search/Filter Orders
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            MessageBox.Show("Adding new orders is disabled for now.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            string searchText = SearchTextBox.Text.Trim().ToLower();
+
+            if (string.IsNullOrEmpty(searchText))
+            {
+                OrdersDataGrid.ItemsSource = allOrders;
+            }
+            else
+            {
+                var filtered = allOrders.Where(o =>
+                    o.InvoiceId.ToString().Contains(searchText) ||
+                    o.CustomerName.ToLower().Contains(searchText) ||
+                    o.Brand.ToLower().Contains(searchText) ||
+                    o.Quantity.ToLower().Contains(searchText) ||
+                    o.Address.ToLower().Contains(searchText) ||
+                    o.DeliveryDate.ToString("dd MMM yyyy").ToLower().Contains(searchText)
+                ).ToList();
+
+                OrdersDataGrid.ItemsSource = filtered;
+            }
         }
 
-        private void Update_Click(object sender, RoutedEventArgs e)
+        // 🔹 View Details Button in DataGrid row
+        private void ViewDetailsButton_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Updating orders is disabled for now.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            if (sender is Button button && button.Tag is WaterOrder order)
+            {
+                // Open the WaterViewDetails window
+                WaterViewDetails detailsWindow = new WaterViewDetails(order);
+                detailsWindow.ShowDialog();
+            }
         }
+    }
 
-        private void Delete_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Deleting orders is disabled for now.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+    // 🔹 Water Order Model
+    public class WaterOrder
+    {
+        public int WaterInvoiceId { get; set; }
+        public int InvoiceId { get; set; }
+        public string CustomerName { get; set; }
+        public string Brand { get; set; }
+        public string Quantity { get; set; }
+        public int Units { get; set; }
+        public DateTime DeliveryDate { get; set; }
+        public string Address { get; set; }
     }
 }
